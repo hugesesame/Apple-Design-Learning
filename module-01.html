@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 01 — Appleデザイン哲学の基礎 | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-primary: #0066cc;
+      --color-primary-focus: #0071e3;
+      --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff;
+      --color-canvas-parchment: #f5f5f7;
+      --color-surface-pearl: #fafafc;
+      --color-surface-tile-1: #272729;
+      --color-surface-tile-2: #2a2a2c;
+      --color-surface-black: #000000;
+      --color-ink: #1d1d1f;
+      --color-body-on-dark: #ffffff;
+      --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333;
+      --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0;
+      --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px;
+      --rounded-md: 11px;
+      --rounded-lg: 18px;
+      --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.47;
+      letter-spacing: -0.374px;
+      color: var(--color-ink);
+      background: var(--color-canvas);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Global Nav ─────────────────────────────── */
+    .global-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 44px;
+      background: var(--color-surface-black);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+    }
+    .global-nav__logo {
+      font-size: 21px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.231px;
+      text-decoration: none;
+    }
+    .global-nav__links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      list-style: none;
+    }
+    .global-nav__links a {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: -0.12px;
+      text-decoration: none;
+    }
+    .global-nav__links a:hover { color: #fff; }
+
+    /* ── Sub Nav ────────────────────────────────── */
+    .sub-nav {
+      position: sticky;
+      top: 44px;
+      z-index: 99;
+      height: 52px;
+      background: rgba(245,245,247,0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+    }
+    .sub-nav__breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sub-nav__breadcrumb a {
+      font-size: 14px;
+      color: var(--color-primary);
+      text-decoration: none;
+      letter-spacing: -0.224px;
+    }
+    .sub-nav__breadcrumb span {
+      font-size: 14px;
+      color: var(--color-ink-muted-48);
+      letter-spacing: -0.224px;
+    }
+    .sub-nav__progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .progress-label {
+      font-size: 12px;
+      color: var(--color-ink-muted-48);
+      letter-spacing: -0.12px;
+    }
+    .progress-bar {
+      width: 80px;
+      height: 4px;
+      background: var(--color-hairline);
+      border-radius: var(--rounded-pill);
+      overflow: hidden;
+    }
+    .progress-bar__fill {
+      height: 100%;
+      width: 8.33%;
+      background: var(--color-primary);
+      border-radius: var(--rounded-pill);
+    }
+
+    /* ── Layout ─────────────────────────────────── */
+    .page-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: calc(100vh - 96px);
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* ── Sidebar ────────────────────────────────── */
+    .sidebar {
+      position: sticky;
+      top: 96px;
+      height: calc(100vh - 96px);
+      overflow-y: auto;
+      border-right: 1px solid var(--color-hairline);
+      padding: 32px 0;
+      background: var(--color-canvas);
+    }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-ink-muted-48);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 0 20px;
+      margin-bottom: 8px;
+    }
+    .sidebar__nav {
+      list-style: none;
+      margin-bottom: 32px;
+    }
+    .sidebar__nav li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-ink-muted-48);
+      letter-spacing: -0.224px;
+      text-decoration: none;
+      transition: color 0.15s, background 0.15s;
+      border-radius: 0;
+    }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active {
+      color: var(--color-primary);
+      font-weight: 600;
+      background: rgba(0, 102, 204, 0.06);
+    }
+    .sidebar__nav li a .nav-num {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--color-ink-muted-48);
+      min-width: 20px;
+    }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid var(--color-hairline);
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .sidebar__nav li a.done .nav-check {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    /* ── Article Content ─────────────────────────── */
+    .article {
+      padding: 64px 72px 120px;
+      max-width: 760px;
+    }
+
+    .article__eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-primary);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .article__title {
+      font-size: 40px;
+      font-weight: 600;
+      line-height: 1.10;
+      letter-spacing: 0;
+      color: var(--color-ink);
+      margin-bottom: 16px;
+    }
+
+    .article__lead {
+      font-size: 24px;
+      font-weight: 300;
+      line-height: 1.5;
+      color: var(--color-ink-muted-48);
+      margin-bottom: 48px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--color-hairline);
+    }
+
+    /* ── Article Body ───────────────────────────── */
+    .prose h2 {
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.14;
+      letter-spacing: 0.196px;
+      color: var(--color-ink);
+      margin: 56px 0 16px;
+    }
+    .prose h3 {
+      font-size: 21px;
+      font-weight: 600;
+      line-height: 1.19;
+      letter-spacing: 0.231px;
+      color: var(--color-ink);
+      margin: 40px 0 12px;
+    }
+    .prose p {
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.47;
+      letter-spacing: -0.374px;
+      color: var(--color-ink);
+      margin-bottom: 20px;
+    }
+    .prose strong {
+      font-weight: 600;
+    }
+    .prose a {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+    .prose a:hover { text-decoration: underline; }
+
+    /* ── Callout ────────────────────────────────── */
+    .callout {
+      background: var(--color-canvas-parchment);
+      border-left: 3px solid var(--color-primary);
+      border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0;
+      padding: 20px 24px;
+      margin: 32px 0;
+    }
+    .callout__label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-primary);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .callout p {
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--color-ink);
+      line-height: 1.47;
+      letter-spacing: -0.374px;
+      margin: 0;
+    }
+
+    /* ── Principle Card ─────────────────────────── */
+    .principle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .principle-card {
+      background: var(--color-canvas);
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--rounded-lg);
+      padding: 24px;
+    }
+    .principle-card__num {
+      font-size: 40px;
+      font-weight: 600;
+      line-height: 1;
+      color: var(--color-primary);
+      opacity: 0.25;
+      margin-bottom: 12px;
+    }
+    .principle-card__title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--color-ink);
+      letter-spacing: -0.374px;
+      margin-bottom: 8px;
+    }
+    .principle-card__desc {
+      font-size: 14px;
+      color: var(--color-ink-muted-48);
+      line-height: 1.43;
+      letter-spacing: -0.224px;
+    }
+
+    /* ── Visual Demo ────────────────────────────── */
+    .demo-block {
+      border-radius: var(--rounded-lg);
+      overflow: hidden;
+      margin: 32px 0;
+      box-shadow: var(--shadow-product);
+    }
+    .demo-block__label {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--color-ink-muted-48);
+      letter-spacing: -0.12px;
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    /* Before/After Demo */
+    .before-after {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .ba-card {
+      border-radius: var(--rounded-lg);
+      overflow: hidden;
+      border: 1px solid var(--color-hairline);
+    }
+    .ba-card__header {
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .ba-card__header--before {
+      background: #fff3f3;
+      color: #cc0000;
+    }
+    .ba-card__header--after {
+      background: #f0f8ff;
+      color: var(--color-primary);
+    }
+    .ba-card__content {
+      padding: 24px;
+      background: var(--color-canvas-parchment);
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    /* Apple tile mini demo */
+    .mini-tile {
+      width: 100%;
+      padding: 24px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .mini-tile--light { background: var(--color-canvas); }
+    .mini-tile--dark  { background: var(--color-surface-tile-1); }
+    .mini-tile__headline-sm {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.374px;
+    }
+    .mini-tile__sub-sm {
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+    .mini-btn {
+      font-size: 12px;
+      font-weight: 400;
+      padding: 6px 14px;
+      border-radius: var(--rounded-pill);
+      border: none;
+      cursor: default;
+    }
+    .mini-btn--primary { background: var(--color-primary); color: #fff; }
+    .mini-btn--ghost   { background: transparent; color: var(--color-primary); border: 1px solid var(--color-primary); }
+
+    /* ── Do / Don't ─────────────────────────────── */
+    .do-dont {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .do-dont__col-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin-bottom: 12px;
+    }
+    .do-dont__col-title--do { color: #00843d; }
+    .do-dont__col-title--dont { color: #cc0000; }
+    .do-dont__list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .do-dont__list li {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-ink);
+      line-height: 1.43;
+      letter-spacing: -0.224px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .do-dont__list li::before {
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-weight: 700;
+    }
+    .do-dont__list--do li::before { content: '✓'; color: #00843d; }
+    .do-dont__list--dont li::before { content: '✕'; color: #cc0000; }
+
+    /* ── Key Point ──────────────────────────────── */
+    .key-point {
+      background: var(--color-surface-tile-1);
+      border-radius: var(--rounded-lg);
+      padding: 32px;
+      margin: 40px 0;
+      text-align: center;
+    }
+    .key-point__quote {
+      font-size: 24px;
+      font-weight: 300;
+      line-height: 1.5;
+      color: var(--color-body-on-dark);
+      margin-bottom: 16px;
+    }
+    .key-point__attr {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-body-muted);
+      letter-spacing: -0.224px;
+    }
+    /* .prose p (0-1-1) を上書き: 2クラス (0-2-0) で詳細度を上げる */
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .callout .callout__label     { color: var(--color-primary); }
+
+    /* ── Token Table ────────────────────────────── */
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+    .token-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-ink-muted-48);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--color-hairline);
+    }
+    .token-table td {
+      padding: 10px 12px;
+      font-size: 14px;
+      color: var(--color-ink);
+      letter-spacing: -0.224px;
+      border-bottom: 1px solid var(--color-divider-soft);
+      vertical-align: middle;
+    }
+    .token-table tr:last-child td { border-bottom: none; }
+    .token-name {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      background: var(--color-canvas-parchment);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--color-ink-muted-80);
+    }
+    .color-swatch-inline {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    /* ── Exercise ───────────────────────────────── */
+    .exercise {
+      background: var(--color-canvas-parchment);
+      border-radius: var(--rounded-lg);
+      padding: 32px;
+      margin: 40px 0;
+    }
+    .exercise__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: rgba(0, 102, 204, 0.1);
+      padding: 4px 12px;
+      border-radius: var(--rounded-pill);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .exercise__title {
+      font-size: 21px;
+      font-weight: 600;
+      color: var(--color-ink);
+      letter-spacing: 0.231px;
+      margin-bottom: 12px;
+    }
+    .exercise__desc {
+      font-size: 17px;
+      color: var(--color-ink);
+      line-height: 1.47;
+      letter-spacing: -0.374px;
+      margin-bottom: 20px;
+    }
+    .exercise__steps {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      counter-reset: step;
+    }
+    .exercise__steps li {
+      display: flex;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--color-ink);
+      line-height: 1.43;
+      letter-spacing: -0.224px;
+      counter-increment: step;
+    }
+    .exercise__steps li::before {
+      content: counter(step);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Module Nav ─────────────────────────────── */
+    .module-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 40px 0 0;
+      border-top: 1px solid var(--color-hairline);
+      margin-top: 80px;
+    }
+    .module-nav__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-primary);
+      text-decoration: none;
+      letter-spacing: -0.224px;
+      transition: opacity 0.15s;
+    }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__btn--disabled { color: var(--color-ink-muted-48); pointer-events: none; }
+    .module-nav__center {
+      font-size: 12px;
+      color: var(--color-ink-muted-48);
+      letter-spacing: -0.12px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-primary);
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: -0.224px;
+      line-height: 1;
+      padding: 8px 18px;
+      border-radius: var(--rounded-pill);
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.1s;
+    }
+    .btn-primary:active { transform: scale(0.95); }
+
+    /* ── Responsive ─────────────────────────────── */
+    @media (max-width: 833px) {
+      .page-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .article { padding: 40px 24px 80px; }
+      .principle-grid { grid-template-columns: 1fr; }
+      .before-after { grid-template-columns: 1fr; }
+      .do-dont { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Global Nav ────────────────────────────── -->
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+
+  <!-- ── Sub Nav ───────────────────────────────── -->
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a>
+      <span>›</span>
+      <span>Module 01</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">1 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <!-- ── Page Layout ───────────────────────────── -->
+  <div class="page-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 01</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro" class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#philosophy"><span class="nav-num">2.</span> UI消失の哲学<div class="nav-check"></div></a></li>
+        <li><a href="#minimalism"><span class="nav-num">3.</span> ミニマリズムの構造<div class="nav-check"></div></a></li>
+        <li><a href="#museum"><span class="nav-num">4.</span> 美術館モデル<div class="nav-check"></div></a></li>
+        <li><a href="#single-accent"><span class="nav-num">5.</span> 単一アクセント原則<div class="nav-check"></div></a></li>
+        <li><a href="#rhythm"><span class="nav-num">6.</span> タイルリズム<div class="nav-check"></div></a></li>
+        <li><a href="#principles"><span class="nav-num">7.</span> 7つの原則まとめ<div class="nav-check"></div></a></li>
+        <li><a href="#exercise"><span class="nav-num">8.</span> 演習<div class="nav-check"></div></a></li>
+      </ul>
+
+      <p class="sidebar__section-label">次のモジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-02.html"><span class="nav-num">02.</span> カラーシステム<div class="nav-check"></div></a></li>
+        <li><a href="module-03.html"><span class="nav-num">03.</span> タイポグラフィ<div class="nav-check"></div></a></li>
+        <li><a href="module-04.html"><span class="nav-num">04.</span> スペーシング<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <!-- Article -->
+    <main>
+      <article class="article">
+
+        <p class="article__eyebrow">Module 01 · 基礎</p>
+        <h1 class="article__title">Appleデザイン哲学の基礎</h1>
+        <p class="article__lead">なぜAppleのサイトは「静か」なのに、こんなにも力強いのか。その答えは、UIを消すという逆説的な設計思想にある。</p>
+
+        <!-- 1. はじめに -->
+        <section id="intro" class="prose">
+          <h2>このモジュールで学ぶこと</h2>
+          <p>Apple的なデザインを「真似る」のは難しくない。アクセントカラーを青にして、フォントを太くして、角丸のボタンを置けば、それっぽくなる。しかし、本物の理解はその先にある。</p>
+          <p>このモジュールでは、Appleのデザイン言語を支える<strong>思想的な土台</strong>を学ぶ。どのコンポーネントを使うかではなく、なぜそのコンポーネントがそのように設計されているかを理解することで、Appleのデザインを「応用」できるようになる。</p>
+
+          <div class="callout">
+            <p class="callout__label">このモジュールの目標</p>
+            <p>apple.comの任意のページを開いたとき、「この選択の理由」を言語化できるようになること。</p>
+          </div>
+        </section>
+
+        <!-- 2. UI消失の哲学 -->
+        <section id="philosophy" class="prose">
+          <h2>UI消失の哲学</h2>
+          <p>Appleのウェブデザインを一言で表すなら、<strong>「UIは消える、プロダクトが語る」</strong>だ。これは偶然の産物ではなく、徹底した設計思想の結果である。</p>
+          <p>一般的なウェブサイトは、UI要素によってプロダクトの価値を「説明」しようとする。カラフルなバッジ、グラデーションの背景、複数のアクセントカラー、装飾的なボーダー。これらはすべて、ユーザーの目を引こうとするUIの声だ。</p>
+          <p>Appleはその逆を行く。UIの声を限りなくゼロに近づけ、プロダクトの声だけを残す。その結果、ユーザーの視線はUIを素通りして、プロダクトそのものに吸い寄せられる。</p>
+
+          <div class="key-point">
+            <p class="key-point__quote">「最高のデザインは存在を主張しない。<br>ユーザーはデザインに気づかず、ただプロダクトと対話する。」</p>
+            <p class="key-point__attr">— Apple Design Language より</p>
+          </div>
+
+          <h3>なぜUIを消すのか</h3>
+          <p>プロダクトを売るのがウェブサイトの目的なら、UIは目的の達成を妨げる「ノイズ」になり得る。特にAppleのような、プロダクトのフォルム・素材・仕上げに極限まで投資している企業にとって、プロダクトビジュアルの前でUIが自己主張することは、本末転倒だ。</p>
+          <p>この哲学は実装に直結する。装飾的なグラデーションは禁止、カードにシャドウをつけない、第二のアクセントカラーは存在しない。これらの「禁則」は制約ではなく、UI消失哲学の具体的な表れだ。</p>
+        </section>
+
+        <!-- 3. ミニマリズムの構造 -->
+        <section id="minimalism" class="prose">
+          <h2>ミニマリズムの構造</h2>
+          <p>「シンプルにする」と「ミニマリズム」は違う。ミニマリズムは要素を削ることではなく、<strong>各要素に明確な役割を与えること</strong>だ。Appleのデザインには、削ぎ落とした後に残った要素が確かにある。そしてその各要素は、代替不可能な役割を担っている。</p>
+
+          <div class="before-after">
+            <div class="ba-card">
+              <div class="ba-card__header ba-card__header--before">✕ 過剰なUI</div>
+              <div class="ba-card__content">
+                <div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:8px; width:100%;">
+                  <div style="font-size:13px; font-weight:700; color:#1d1d1f; background:linear-gradient(135deg,#667eea,#764ba2); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">iPhone 16 Pro</div>
+                  <div style="font-size:10px; color:#7a7a7a;">最高のカメラ体験</div>
+                  <div style="display:flex; gap:6px;">
+                    <span style="font-size:10px; padding:3px 8px; border-radius:9999px; background:#ff3b30; color:#fff;">NEW</span>
+                    <span style="font-size:10px; padding:3px 8px; border-radius:9999px; background:#ff9500; color:#fff;">SALE</span>
+                  </div>
+                  <div style="display:flex; gap:4px; margin-top:4px;">
+                    <button class="mini-btn mini-btn--primary" style="background:#667eea;">購入</button>
+                    <button class="mini-btn" style="background:#34c759; color:#fff; border-radius:9999px; border:none; padding:6px 14px; font-size:12px;">詳細</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="ba-card">
+              <div class="ba-card__header ba-card__header--after">✓ Apple式</div>
+              <div class="ba-card__content" style="background:#fff;">
+                <div class="mini-tile mini-tile--light">
+                  <div class="mini-tile__headline-sm" style="color:#1d1d1f;">iPhone 16 Pro</div>
+                  <div class="mini-tile__sub-sm" style="color:#7a7a7a;">ビデオ。これが映画だ。</div>
+                  <div style="display:flex; gap:10px; margin-top:4px;">
+                    <button class="mini-btn mini-btn--primary">詳しく見る</button>
+                    <button class="mini-btn mini-btn--ghost">購入する</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p>左の例はUIが叫んでいる。グラデーションテキスト、バッジの乱用、複数の緑と紫。右のApple式では、UI要素はヘッドライン・タグライン・2つのCTAだけ。それ以外はすべて「余白」として処理されている。</p>
+
+          <div class="callout">
+            <p class="callout__label">設計上のルール</p>
+            <p>各タイルに置ける要素は原則として「プロダクト名 → タグライン → 2つのCTA → プロダクトビジュアル」の4種のみ。これ以上足さない。</p>
+          </div>
+        </section>
+
+        <!-- 4. 美術館モデル -->
+        <section id="museum" class="prose">
+          <h2>美術館モデル</h2>
+          <p>Appleのデザインチームは、自社のウェブサイトを<strong>「美術館」</strong>として設計している。美術館で何かが気になったことはないだろうか。壁が白く、照明が静かで、展示物以外に何もない。その環境は、作品に100%の注意を向けさせるために設計されている。</p>
+          <p>apple.comはそれと同じだ。白とオフホワイト（パーチメント）のタイル、純黒のナビゲーションバー、それ以外には何もない。装飾的なボーダーも、グラデーションも、カードのシャドウも存在しない。「壁」（UI）が消えることで、「作品」（プロダクト）が際立つ。</p>
+
+          <div class="demo-block">
+            <div style="display:flex; flex-direction:column;">
+              <div class="mini-tile mini-tile--light" style="padding:32px 20px;">
+                <div class="mini-tile__headline-sm" style="font-size:20px; color:#1d1d1f; letter-spacing:-0.28px;">MacBook Pro</div>
+                <div class="mini-tile__sub-sm" style="color:#7a7a7a; font-size:13px;">あなたを超えて。</div>
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                  <button class="mini-btn mini-btn--primary">詳しく見る</button>
+                  <button class="mini-btn mini-btn--ghost">購入する</button>
+                </div>
+                <div style="width:100%; height:80px; background:#d1d1d6; border-radius:8px; margin-top:16px; box-shadow:rgba(0,0,0,0.22) 3px 5px 30px 0;"></div>
+              </div>
+              <div class="mini-tile mini-tile--dark" style="padding:32px 20px;">
+                <div class="mini-tile__headline-sm" style="color:#fff; font-size:20px; letter-spacing:-0.28px;">iPad Pro</div>
+                <div class="mini-tile__sub-sm" style="color:#ccc; font-size:13px;">驚くほど薄い。驚くほど速い。</div>
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                  <button class="mini-btn mini-btn--primary">詳しく見る</button>
+                  <button class="mini-btn mini-btn--ghost" style="color:#2997ff; border-color:#2997ff;">購入する</button>
+                </div>
+                <div style="width:100%; height:80px; background:#3a3a3c; border-radius:8px; margin-top:16px; box-shadow:rgba(0,0,0,0.22) 3px 5px 30px 0;"></div>
+              </div>
+            </div>
+          </div>
+          <p class="demo-block__label">ライトタイルとダークタイルが交互に積まれる。境界線はなく、色の変化だけがセクションの区切りになる。</p>
+
+          <h3>密度は意図的に低い</h3>
+          <p>美術館で展示物を詰め込まないように、Appleのタイルも密度が低い。各タイルはほぼ1ビューポートを占有し、縦方向のパディングは80px。これは現代のSaaSサイトの基準から見ても異例に余白が大きい。しかしこの「余白」こそが、プロダクトを「ペデスタル（台座）」に乗せる行為だ。</p>
+        </section>
+
+        <!-- 5. 単一アクセント原則 -->
+        <section id="single-accent" class="prose">
+          <h2>単一アクセント原則</h2>
+          <p>apple.comに存在するブランドカラーは<strong>1色だけ</strong>だ。Action Blue（#0066cc）。すべてのリンク、すべてのCTA、すべてのフォーカスリングは、例外なくこの青だ。</p>
+          <p>これは制約ではなく設計の選択だ。インタラクティブ要素を1色で統一することで、ユーザーは「青 = クリックできる」という規則をページ全体で一貫して学習する。第二のアクセントカラーを導入した瞬間、このルールは崩れる。</p>
+
+          <table class="token-table">
+            <thead>
+              <tr>
+                <th>トークン</th>
+                <th>値</th>
+                <th>用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="token-name">{colors.primary}</span></td>
+                <td><span class="color-swatch-inline" style="background:#0066cc;"></span>#0066cc</td>
+                <td>すべてのインタラクティブ要素（ライトサーフェス）</td>
+              </tr>
+              <tr>
+                <td><span class="token-name">{colors.primary-focus}</span></td>
+                <td><span class="color-swatch-inline" style="background:#0071e3;"></span>#0071e3</td>
+                <td>キーボードフォーカスリング</td>
+              </tr>
+              <tr>
+                <td><span class="token-name">{colors.primary-on-dark}</span></td>
+                <td><span class="color-swatch-inline" style="background:#2997ff;"></span>#2997ff</td>
+                <td>ダークタイル上のリンク（Action Blueは暗背景で見えなくなるため）</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <p class="callout__label">重要</p>
+            <p>ダークタイル上だけ Sky Link Blue (#2997ff) に切り替えるのは、視認性の確保のため。これは「第二のブランドカラー」ではなく、同じ青のサーフェス適応バリアントだ。</p>
+          </div>
+        </section>
+
+        <!-- 6. タイルリズム -->
+        <section id="rhythm" class="prose">
+          <h2>タイルリズム</h2>
+          <p>apple.comの視覚的なリズムは、<strong>ライトタイルとダークタイルの交互配置</strong>によって生まれる。ボーダーも、セパレーターも、見出しラインも使わない。色の変化だけが、セクションの区切りになる。</p>
+          <p>このリズムには予測可能なパターンがある：<strong>ライトヒーロー → ダーク製品タイル → ライトユーティリティ → ダーク → パーチメントフッター</strong>。ユーザーがスクロールするほど、このリズムは心地よい期待感を生む。</p>
+
+          <div style="display:flex; flex-direction:column; border-radius:var(--rounded-lg); overflow:hidden; border:1px solid var(--color-hairline); margin:24px 0;">
+            <div style="background:#fff; padding:16px 20px; display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:12px; font-weight:600; color:#1d1d1f;">ライトタイル</span>
+              <span class="token-name">{colors.canvas} #ffffff</span>
+            </div>
+            <div style="background:#272729; padding:16px 20px; display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:12px; font-weight:600; color:#fff;">ダークタイル</span>
+              <span style="font-family:monospace; font-size:12px; background:#3a3a3c; color:#ccc; padding:2px 6px; border-radius:4px;">{colors.surface-tile-1} #272729</span>
+            </div>
+            <div style="background:#f5f5f7; padding:16px 20px; display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:12px; font-weight:600; color:#1d1d1f;">パーチメントタイル</span>
+              <span class="token-name">{colors.canvas-parchment} #f5f5f7</span>
+            </div>
+            <div style="background:#2a2a2c; padding:16px 20px; display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:12px; font-weight:600; color:#fff;">ダークタイル 2</span>
+              <span style="font-family:monospace; font-size:12px; background:#3a3a3c; color:#ccc; padding:2px 6px; border-radius:4px;">{colors.surface-tile-2} #2a2a2c</span>
+            </div>
+            <div style="background:#f5f5f7; padding:16px 20px; display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:12px; font-weight:600; color:#1d1d1f;">フッター（パーチメント）</span>
+              <span class="token-name">{colors.canvas-parchment} #f5f5f7</span>
+            </div>
+          </div>
+
+          <p>隣り合うダークタイル同士（#272729 と #2a2a2c）の差は、人間の目でかろうじて認識できるレベルだ。これは「ほぼ同じに見えるが、明確には違う」という、Appleらしいマイクロレベルの繊細さだ。</p>
+        </section>
+
+        <!-- 7. 7つの原則 -->
+        <section id="principles" class="prose">
+          <h2>Appleデザイン哲学 7つの原則</h2>
+          <p>このモジュールで学んだ内容を、判断基準として使える形に整理する。</p>
+
+          <div class="principle-grid">
+            <div class="principle-card">
+              <div class="principle-card__num">01</div>
+              <h3 class="principle-card__title">写真が主役、UIが脇役</h3>
+              <p class="principle-card__desc">すべての設計判断は「プロダクトビジュアルを際立たせるか」を基準にする。</p>
+            </div>
+            <div class="principle-card">
+              <div class="principle-card__num">02</div>
+              <h3 class="principle-card__title">単一アクセントカラー</h3>
+              <p class="principle-card__desc">Action Blue (#0066cc) 以外のブランドカラーは存在しない。第二のアクセントは絶対に導入しない。</p>
+            </div>
+            <div class="principle-card">
+              <div class="principle-card__num">03</div>
+              <h3 class="principle-card__title">タイル交互リズム</h3>
+              <p class="principle-card__desc">ライト ↔ ダークの交互配置がセクション区切り。ボーダーやデバイダーは使わない。</p>
+            </div>
+            <div class="principle-card">
+              <div class="principle-card__num">04</div>
+              <h3 class="principle-card__title">シャドウはプロダクトのみ</h3>
+              <p class="principle-card__desc">ドロップシャドウはプロダクト写真に1種類だけ。カード・ボタン・テキストにシャドウをつけない。</p>
+            </div>
+            <div class="principle-card">
+              <div class="principle-card__num">05</div>
+              <h3 class="principle-card__title">グラデーション禁止</h3>
+              <p class="principle-card__desc">大気感はCSSグラデーションではなく写真が担う。デザイントークンに装飾グラデーションは存在しない。</p>
+            </div>
+            <div class="principle-card">
+              <div class="principle-card__num">06</div>
+              <h3 class="principle-card__title">余白はペデスタル</h3>
+              <p class="principle-card__desc">80pxの垂直パディングは「多すぎる」ではなく「台座」だ。プロダクトの近くに要素を寄せない。</p>
+            </div>
+            <div class="principle-card">
+              <div class="principle-card__num">07</div>
+              <h3 class="principle-card__title">ピル = アクション</h3>
+              <p class="principle-card__desc">border-radius:9999px（ピル型）は「クリックするもの」の専用形状。装飾には使わない。</p>
+            </div>
+            <div class="principle-card">
+              <div class="principle-card__num">08</div>
+              <h3 class="principle-card__title">タイル内の要素は4種のみ</h3>
+              <p class="principle-card__desc">プロダクト名 / タグライン / 2つのCTA / ビジュアル。この4種以外を追加しない。</p>
+            </div>
+          </div>
+
+          <!-- Do/Don't -->
+          <h3 style="margin-top:48px;">Do's & Don'ts</h3>
+          <div class="do-dont">
+            <div>
+              <p class="do-dont__col-title do-dont__col-title--do">Do ✓</p>
+              <ul class="do-dont__list do-dont__list--do">
+                <li>すべてのCTAに同じAction Blueを使う</li>
+                <li>タイルの背景色の変化だけでセクションを分ける</li>
+                <li>プロダクトビジュアルだけにシャドウを適用する</li>
+                <li>ボディテキストを17pxで設定する</li>
+                <li>ピル形状（9999px）をアクション要素専用にする</li>
+                <li>各タイルに80px以上の垂直余白を確保する</li>
+              </ul>
+            </div>
+            <div>
+              <p class="do-dont__col-title do-dont__col-title--dont">Don't ✕</p>
+              <ul class="do-dont__list do-dont__list--dont">
+                <li>第二のアクセントカラー（緑・紫など）を使う</li>
+                <li>カードやボタンにシャドウをつける</li>
+                <li>装飾的なグラデーションを背景に使う</li>
+                <li>font-weight: 500を使う（400/600/700のみ）</li>
+                <li>タイルにボーダーや区切り線を引く</li>
+                <li>フルブリードタイルに角丸をつける</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. 演習 -->
+        <section id="exercise">
+          <div class="exercise">
+            <span class="exercise__badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              演習
+            </span>
+            <h2 class="exercise__title">あなたの周りのAppleデザインを分析する</h2>
+            <p class="exercise__desc">apple.comを開き、以下のチェックリストを使って「7つの原則」が実際にどう適用されているかを確認してください。デベロッパーツール（⌘+Option+I）を使って、実際のCSS値を確かめましょう。</p>
+            <ol class="exercise__steps">
+              <li>apple.comのホームページを開き、最初の3つのタイルの背景色を確認する。white / parchment / dark が交互になっているか確認せよ。</li>
+              <li>ページ上のすべてのクリッカブル要素（リンク、ボタン）を見つけ、アクセントカラーが何色使われているかを数える。</li>
+              <li>デベロッパーツールでプロダクト画像のCSSを調べ、box-shadow の値が <code style="font-family:monospace; font-size:13px; background:#f5f5f7; padding:2px 5px; border-radius:4px;">rgba(0,0,0,0.22) 3px 5px 30px</code> になっているか確認せよ。</li>
+              <li>ページ上のテキスト要素のfont-weightを3つ調べ、300 / 400 / 600 / 700 のどれが使われているかを確認。500が使われていないことを確認せよ。</li>
+              <li>気づいた発見を、Notion または紙のメモに書き出し、コミュニティに投稿してみよう。</li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- Module Nav -->
+        <nav class="module-nav">
+          <span class="module-nav__btn module-nav__btn--disabled">← 前のモジュール</span>
+          <span class="module-nav__center">Module 01 / 12</span>
+          <a class="module-nav__btn" href="module-02.html">Module 02 →</a>
+        </nav>
+
+      </article>
+    </main>
+  </div>
+
+</body>
+</html>

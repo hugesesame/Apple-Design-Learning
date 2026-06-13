@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 11 — コンテンツ設計 | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-primary: #0066cc; --color-primary-focus: #0071e3; --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff; --color-canvas-parchment: #f5f5f7; --color-surface-pearl: #fafafc;
+      --color-surface-tile-1: #272729; --color-surface-black: #000000;
+      --color-ink: #1d1d1f; --color-body-on-dark: #ffffff; --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333; --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0; --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px; --rounded-md: 11px; --rounded-lg: 18px; --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); background: var(--color-canvas); -webkit-font-smoothing: antialiased; }
+
+    .global-nav { position: sticky; top: 0; z-index: 100; height: 44px; background: var(--color-surface-black); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .global-nav__logo { font-size: 21px; font-weight: 600; color: #fff; letter-spacing: 0.231px; text-decoration: none; }
+    .global-nav__links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .global-nav__links a { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: -0.12px; text-decoration: none; }
+    .global-nav__links a:hover { color: #fff; }
+    .sub-nav { position: sticky; top: 44px; z-index: 99; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .sub-nav__breadcrumb { display: flex; align-items: center; gap: 6px; }
+    .sub-nav__breadcrumb a { font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .sub-nav__breadcrumb span { font-size: 14px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+    .sub-nav__progress { display: flex; align-items: center; gap: 12px; }
+    .progress-label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .progress-bar { width: 80px; height: 4px; background: var(--color-hairline); border-radius: var(--rounded-pill); overflow: hidden; }
+    .progress-bar__fill { height: 100%; width: 91.67%; background: var(--color-primary); border-radius: var(--rounded-pill); }
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 96px); max-width: 1280px; margin: 0 auto; }
+    .sidebar { position: sticky; top: 96px; height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--color-hairline); padding: 32px 0; background: var(--color-canvas); }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+    .sidebar__nav { list-style: none; margin-bottom: 32px; }
+    .sidebar__nav li a { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 14px; font-weight: 400; color: var(--color-ink-muted-48); letter-spacing: -0.224px; text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active { color: var(--color-primary); font-weight: 600; background: rgba(0,102,204,0.06); }
+    .sidebar__nav li a .nav-num { font-size: 11px; color: var(--color-ink-muted-48); min-width: 20px; }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-hairline); margin-left: auto; flex-shrink: 0; }
+    .sidebar__nav li a.done .nav-check { background: var(--color-primary); border-color: var(--color-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+    .article { padding: 64px 72px 120px; max-width: 760px; }
+    .article__eyebrow { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .article__title { font-size: 40px; font-weight: 600; line-height: 1.10; letter-spacing: 0; color: var(--color-ink); margin-bottom: 16px; }
+    .article__lead { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-ink-muted-48); margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--color-hairline); }
+    .prose h2 { font-size: 28px; font-weight: 600; line-height: 1.14; letter-spacing: 0.196px; color: var(--color-ink); margin: 56px 0 16px; }
+    .prose h3 { font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; color: var(--color-ink); margin: 40px 0 12px; }
+    .prose p { font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); margin-bottom: 20px; }
+    .prose strong { font-weight: 600; }
+    .callout { background: var(--color-canvas-parchment); border-left: 3px solid var(--color-primary); border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0; padding: 20px 24px; margin: 32px 0; }
+    .callout__label { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout p { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin: 0; }
+    .callout .callout__label { color: var(--color-primary); }
+    .key-point { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; text-align: center; }
+    .key-point__quote { font-size: 24px; font-weight: 300; line-height: 1.5; margin-bottom: 16px; }
+    .key-point__attr { font-size: 14px; font-weight: 400; letter-spacing: -0.224px; }
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .token-name { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); }
+    .exercise { background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; }
+    .exercise__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-primary); background: rgba(0,102,204,0.1); padding: 4px 12px; border-radius: var(--rounded-pill); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+    .exercise__title { font-size: 21px; font-weight: 600; color: var(--color-ink); letter-spacing: 0.231px; margin-bottom: 12px; }
+    .exercise__desc { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin-bottom: 20px; }
+    .exercise__steps { list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+    .exercise__steps li { display: flex; gap: 12px; font-size: 14px; color: var(--color-ink); line-height: 1.43; letter-spacing: -0.224px; counter-increment: step; }
+    .exercise__steps li::before { content: counter(step); width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0 0; border-top: 1px solid var(--color-hairline); margin-top: 80px; }
+    .module-nav__btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__center { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+
+    /* ── Copy comparison ───────────────────── */
+    .copy-compare { display: flex; flex-direction: column; gap: 16px; margin: 32px 0; }
+    .copy-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .copy-box { padding: 16px 20px; border-radius: var(--rounded-md); }
+    .copy-box--bad  { background: #fff5f5; border: 1px solid rgba(197,34,31,0.2); }
+    .copy-box--good { background: #f0fff4; border: 1px solid rgba(26,138,58,0.2); }
+    .copy-box__tag { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 8px; }
+    .copy-box--bad  .copy-box__tag { color: #c5221f; }
+    .copy-box--good .copy-box__tag { color: #1a8a3a; }
+    .copy-box__text { font-size: 15px; line-height: 1.5; color: var(--color-ink); letter-spacing: -0.224px; }
+
+    /* ── CTA pattern table ─────────────────── */
+    .cta-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .cta-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .cta-table td { padding: 10px 12px; font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: top; }
+    .cta-table tr:last-child td { border-bottom: none; }
+    .cta-pill { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 9999px; background: var(--color-primary); color: #fff; font-size: 13px; font-weight: 400; }
+    .cta-pill--ghost { background: transparent; color: var(--color-primary); border: 1px solid var(--color-primary); }
+
+    /* ── Number showcase ───────────────────── */
+    .number-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 24px 0; }
+    .number-card { border: 1px solid var(--color-hairline); border-radius: var(--rounded-lg); padding: 20px; text-align: center; }
+    .number-card__num { font-size: 40px; font-weight: 300; letter-spacing: 0; color: var(--color-ink); line-height: 1.1; }
+    .number-card__unit { font-size: 21px; font-weight: 300; }
+    .number-card__desc { font-size: 12px; color: var(--color-ink-muted-48); margin-top: 8px; letter-spacing: -0.12px; }
+
+    /* ── Voice/Tone table ─────────────────── */
+    .voice-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .voice-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .voice-table td { padding: 10px 12px; font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: top; line-height: 1.5; }
+    .voice-table tr:last-child td { border-bottom: none; }
+    .voice-attr { font-size: 13px; font-weight: 600; color: var(--color-ink); }
+
+    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .article { padding: 40px 24px 80px; } .copy-pair { grid-template-columns: 1fr; } .number-grid { grid-template-columns: repeat(2,1fr); } }
+  </style>
+</head>
+<body>
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a><span>›</span><span>Module 11</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">11 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 11</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro"  class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#voice" ><span class="nav-num">2.</span> ボイスとトーン<div class="nav-check"></div></a></li>
+        <li><a href="#hero"  ><span class="nav-num">3.</span> ヒーローコピー<div class="nav-check"></div></a></li>
+        <li><a href="#cta"   ><span class="nav-num">4.</span> CTAの言葉<div class="nav-check"></div></a></li>
+        <li><a href="#numbers"><span class="nav-num">5.</span> 数字の表現<div class="nav-check"></div></a></li>
+        <li><a href="#names" ><span class="nav-num">6.</span> 製品名の使い方<div class="nav-check"></div></a></li>
+        <li><a href="#length"><span class="nav-num">7.</span> テキスト量と視覚<div class="nav-check"></div></a></li>
+        <li><a href="#exercise"><span class="nav-num">8.</span> 演習<div class="nav-check"></div></a></li>
+      </ul>
+      <p class="sidebar__section-label">モジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-10.html" class="done"><span class="nav-num">10.</span> アクセシビリティ<div class="nav-check"></div></a></li>
+        <li><a href="module-11.html" class="active"><span class="nav-num">11.</span> コンテンツ設計<div class="nav-check"></div></a></li>
+        <li><a href="module-12.html"><span class="nav-num">12.</span> 総合プロジェクト<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <article class="article">
+        <p class="article__eyebrow">Module 11 · コンテンツ</p>
+        <h1 class="article__title">コンテンツ設計</h1>
+        <p class="article__lead">ビジュアルは感情を作り、<strong>言葉が意味を作る</strong>。Appleのコピーは視覚デザインと同等の精度で設計されている——その言語パターンを解剖する。</p>
+
+        <section id="intro" class="prose">
+          <h2>コンテンツはデザインの一部だ</h2>
+          <p>多くのデザインプロセスでは「仮テキスト（Lorem ipsum）を入れておいて後でコピーライターが書く」というワークフローをとる。Appleはこれをしない。</p>
+          <p>apple.comのすべてのコピーは<strong>デザインと同時に</strong>、時にデザインより先に設計される。ヒーロータイトルが7文字か12文字かで、フォントサイズが変わる。フォントサイズが変わると、余白が変わる。余白が変わると、製品ビジュアルの位置が変わる——つまりコピーの決定はレイアウトの決定だ。</p>
+          <div class="key-point">
+            <p class="key-point__quote">コンテンツは容器に流し込むものではない。<br>コンテンツがデザインの骨格だ。</p>
+            <p class="key-point__attr">Apple Editorial Philosophy</p>
+          </div>
+        </section>
+
+        <section id="voice" class="prose">
+          <h2>ボイスとトーン</h2>
+          <p>Appleのブランドボイスは変化しない。トーンがコンテキストで変わる。</p>
+
+          <table class="voice-table">
+            <thead><tr><th>属性</th><th>意味</th><th>例</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="voice-attr">Direct（率直）</span></td>
+                <td>回りくどくない。余分な修飾語を使わない。</td>
+                <td>「最も薄い。最も軽い。」← 主語を省く大胆さ。</td>
+              </tr>
+              <tr>
+                <td><span class="voice-attr">Confident（自信）</span></td>
+                <td>疑問形を使わない。断言する。</td>
+                <td>「あなたの仕事を、変える。」（「〜できるかも」は使わない）</td>
+              </tr>
+              <tr>
+                <td><span class="voice-attr">Human（人間的）</span></td>
+                <td>技術用語を平易な言葉で言い換える。</td>
+                <td>「A18 Pro」ではなく「飛躍的な進化」</td>
+              </tr>
+              <tr>
+                <td><span class="voice-attr">Aspirational（高揚感）</span></td>
+                <td>ユーザーが「なりたい自分」に語りかける。</td>
+                <td>「あなたのクリエイティビティを、解放する。」</td>
+              </tr>
+              <tr>
+                <td><span class="voice-attr">Elegant（上品）</span></td>
+                <td>感嘆符・過激な表現・スラングを使わない。</td>
+                <td>「凄い！」ではなく「驚異的な。」</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="hero" class="prose">
+          <h2>ヒーローコピーの構造</h2>
+          <p>apple.comのヒーロータイルは<strong>タイトル + サブタイトル</strong>の2層構造だ。タイトルで感情を動かし、サブタイトルで具体的な事実を伝える。</p>
+
+          <div class="copy-compare">
+            <div class="copy-pair">
+              <div class="copy-box copy-box--bad">
+                <div class="copy-box__tag">誤りのパターン</div>
+                <div class="copy-box__text">最新のスマートフォン。M3チップ搭載、容量最大512GB、カメラ4800万画素。</div>
+              </div>
+              <div class="copy-box copy-box--good">
+                <div class="copy-box__tag">Appleのパターン</div>
+                <div class="copy-box__text">iPhone 16 Pro。<br>プロが求めるすべて。</div>
+              </div>
+            </div>
+            <div class="copy-pair">
+              <div class="copy-box copy-box--bad">
+                <div class="copy-box__tag">誤りのパターン</div>
+                <div class="copy-box__text">当社の高性能ノートパソコンを使って、あなたのビジネスをもっと効率化しませんか？</div>
+              </div>
+              <div class="copy-box copy-box--good">
+                <div class="copy-box__tag">Appleのパターン</div>
+                <div class="copy-box__text">MacBook Air。<br>無敵のパフォーマンス。<br>ゼロの妥協。</div>
+              </div>
+            </div>
+            <div class="copy-pair">
+              <div class="copy-box copy-box--bad">
+                <div class="copy-box__tag">誤りのパターン</div>
+                <div class="copy-box__text">私たちは素晴らしい製品を作るために日々努力しています。ぜひご覧ください！</div>
+              </div>
+              <div class="copy-box copy-box--good">
+                <div class="copy-box__tag">Appleのパターン</div>
+                <div class="copy-box__text">Think different.</div>
+              </div>
+            </div>
+          </div>
+
+          <h3>短縮の技法</h3>
+          <p>Appleのタイトルは多くの場合、<strong>主語を省く</strong>。「それは最も薄い」ではなく「最も薄い。」。主語のない断言は読者自身が主語を補い、より強い感情を生む。</p>
+        </section>
+
+        <section id="cta" class="prose">
+          <h2>CTAの言葉</h2>
+          <p>CTAボタンのテキストはapple.comで数種類に絞られている。「今すぐ」「クリック」などの煽り文句は存在しない。</p>
+
+          <table class="cta-table">
+            <thead><tr><th>日本語</th><th>英語</th><th>用途</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="cta-pill">詳しく見る</span></td>
+                <td>Learn more</td>
+                <td>製品詳細ページへ。最も多用されるCTA。</td>
+              </tr>
+              <tr>
+                <td><span class="cta-pill">購入する</span></td>
+                <td>Buy</td>
+                <td>購入フローの起点。主CTAの定番。</td>
+              </tr>
+              <tr>
+                <td><span class="cta-pill cta-pill--ghost">比較する</span></td>
+                <td>Compare</td>
+                <td>比較ページへ。セカンダリCTAとして使われる。</td>
+              </tr>
+              <tr>
+                <td><span class="cta-pill cta-pill--ghost">すべて見る</span></td>
+                <td>See all</td>
+                <td>一覧ページへのリンク。コレクション文脈で使用。</td>
+              </tr>
+              <tr>
+                <td><span style="font-size:14px; color:var(--color-primary); text-decoration:underline;">詳しく見る</span></td>
+                <td>Learn more →</td>
+                <td>インラインテキストリンク形式（chevronなし/あり）</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <p class="callout__label">禁止ワード</p>
+            <p>「今すぐ」「クリック」「急いで」「限定」「チェック」— これらの煽動的・マーケティング的な言葉はAppleのCTAに存在しない。CTAはユーザーを急がせるのではなく、次のステップへ<strong>静かに招待する</strong>。</p>
+          </div>
+        </section>
+
+        <section id="numbers" class="prose">
+          <h2>数字の表現</h2>
+          <p>Appleは数字を「情報」として伝えるのではなく、「驚き」として演出する。技術仕様の羅列ではなく、一つの数字を大きく見せることで記憶に残す。</p>
+
+          <div class="number-grid">
+            <div class="number-card">
+              <div class="number-card__num">4<span class="number-card__unit">K</span></div>
+              <div class="number-card__desc">解像度をただ「4K」と書かずに大きな数字として見せる</div>
+            </div>
+            <div class="number-card">
+              <div class="number-card__num">18<span class="number-card__unit">時間</span></div>
+              <div class="number-card__desc">バッテリー駆動時間を断言値として提示</div>
+            </div>
+            <div class="number-card">
+              <div class="number-card__num">2×</div>
+              <div class="number-card__desc">前世代比の倍数表現（具体的な数値より力強い）</div>
+            </div>
+          </div>
+
+          <h3>数字の文法</h3>
+          <ul style="margin:0 0 20px 20px; display:flex; flex-direction:column; gap:10px;">
+            <li style="font-size:17px; letter-spacing:-0.374px;">数字は<strong>算用数字</strong>を使う（「十八時間」ではなく「18時間」）。</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;">単位は数字の<strong>直後</strong>に置く（「18 時間」ではなく「18時間」）。</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;">大きな数字には<strong>Kやm</strong>を使う（「3,000,000」ではなく「3M」）。</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;">比較には「前世代比」「競合比」を明記する。根拠を示す。</li>
+          </ul>
+        </section>
+
+        <section id="names" class="prose">
+          <h2>製品名の使い方</h2>
+          <p>Appleの製品名はシステムとして設計されており、使い方にルールがある。</p>
+
+          <div style="display:flex; flex-direction:column; gap:12px; margin:24px 0;">
+            <div style="padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm);">
+              <div style="font-size:13px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">ファミリー名のみ（= 大文字始まり）</div>
+              <div style="font-size:13px; color:var(--color-ink-muted-48);">iPhone、MacBook、iPad、AirPods — 単独で使える。冠詞「a / the」不要。</div>
+            </div>
+            <div style="padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm);">
+              <div style="font-size:13px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">モデル名（= ファミリー + サフィックス）</div>
+              <div style="font-size:13px; color:var(--color-ink-muted-48);">iPhone 16 Pro、MacBook Pro 16インチ — スペース区切り。「M4 チップ搭載 MacBook Pro」</div>
+            </div>
+            <div style="padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm);">
+              <div style="font-size:13px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">チップ名（= 大文字 + 数字）</div>
+              <div style="font-size:13px; color:var(--color-ink-muted-48);">M4、A18 Pro — 必ずこの形式。「M4チップ」は正しい。「M4 チップス」は誤り。</div>
+            </div>
+            <div style="padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm);">
+              <div style="font-size:13px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">禁止パターン</div>
+              <div style="font-size:13px; color:#c5221f;">「i Phone」（スペース不可）/ 「iphone」（小文字不可）/ 「Apple iPhone」（ブランド名の重複）</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="length" class="prose">
+          <h2>テキスト量と視覚的バランス</h2>
+          <p>Appleのコピーは短い。しかしその「短さ」は偶然ではなく、<strong>視覚的な余白を最大化するための設計上の選択</strong>だ。</p>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:32px 0;">
+            <div style="border:1px solid var(--color-hairline); border-radius:var(--rounded-lg); overflow:hidden;">
+              <div style="background:#272729; padding:40px 24px; text-align:center;">
+                <div style="font-size:32px; font-weight:600; color:#fff; line-height:1.1; margin-bottom:16px;">Pro. そのひとことに、すべてが宿る。</div>
+                <div style="font-size:17px; font-weight:300; color:#ccc; line-height:1.5; margin-bottom:24px;">MacBook Pro</div>
+                <div style="display:inline-flex; gap:12px;">
+                  <span style="padding:8px 18px; border-radius:9999px; background:#2997ff; color:#fff; font-size:14px;">詳しく見る</span>
+                  <span style="padding:8px 18px; border-radius:9999px; border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:14px;">購入する</span>
+                </div>
+              </div>
+              <div style="padding:12px 16px; background:rgba(0,102,204,0.04); text-align:center; font-size:11px; color:var(--color-ink-muted-48);">テキスト少 → 余白多 → 製品が主役</div>
+            </div>
+            <div style="border:2px solid rgba(197,34,31,0.2); border-radius:var(--rounded-lg); overflow:hidden;">
+              <div style="background:#272729; padding:24px; text-align:center;">
+                <div style="font-size:18px; font-weight:600; color:#fff; line-height:1.4; margin-bottom:12px;">この革新的な最新テクノロジーを搭載した私たちの最高傑作。業界最高水準のパフォーマンスをお届けします。</div>
+                <div style="font-size:14px; color:#ccc; margin-bottom:16px;">あなたのビジネスとクリエイティビティを次のレベルへ引き上げるために設計された一台です。</div>
+                <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+                  <span style="padding:8px 14px; border-radius:9999px; background:#2997ff; color:#fff; font-size:13px;">今すぐ詳細を確認する</span>
+                  <span style="padding:8px 14px; border-radius:9999px; border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:13px;">比較して購入を検討する</span>
+                </div>
+              </div>
+              <div style="padding:12px 16px; background:rgba(197,34,31,0.04); text-align:center; font-size:11px; color:#c5221f;">テキスト多 → 余白消える → ごちゃごちゃ</div>
+            </div>
+          </div>
+
+          <p>製品ページのヒーロータイトルは基本的に<strong>全角20字以内</strong>（英語で5〜8単語）を目指す。それ以上になる場合は2行に分けるか、コピーを削る。</p>
+        </section>
+
+        <section id="exercise">
+          <div class="exercise">
+            <span class="exercise__badge">演習</span>
+            <h2 class="exercise__title">Appleスタイルのコピーを書く</h2>
+            <p class="exercise__desc">あなたが関わるプロダクト（自分のポートフォリオ、個人サービス、または仮想の製品）のapple.comスタイルヒーローコピーを書いてください。</p>
+            <ol class="exercise__steps">
+              <li>製品の「最も重要な1つのベネフィット」を選ぶ。機能ではなく、ユーザーの体験として表現する（例: 「高速SSD搭載」→「待つ時間が、消える。」）。</li>
+              <li>タイトルを全角20字以内（英語なら8単語以内）で書く。主語を省き、断言する。</li>
+              <li>サブタイトルを1〜2文で書く。ここで初めて「何ができるか」を具体的に伝える。</li>
+              <li>CTAを「詳しく見る」「購入する」「試す」の3語以内で選ぶ。煽りワード禁止。</li>
+              <li>書いたコピーをFigmaのapple.comテンプレートに配置し、スクリーンショットをコミュニティに投稿する。「どのボイス属性（Direct / Confident / Human など）を意識したか」を1行で添える。</li>
+            </ol>
+          </div>
+        </section>
+
+        <nav class="module-nav">
+          <a class="module-nav__btn" href="module-10.html">← Module 10</a>
+          <span class="module-nav__center">Module 11 / 12</span>
+          <a class="module-nav__btn" href="module-12.html">Module 12 →</a>
+        </nav>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

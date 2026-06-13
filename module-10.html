@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 10 — アクセシビリティ | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-primary: #0066cc; --color-primary-focus: #0071e3; --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff; --color-canvas-parchment: #f5f5f7; --color-surface-pearl: #fafafc;
+      --color-surface-tile-1: #272729; --color-surface-black: #000000;
+      --color-ink: #1d1d1f; --color-body-on-dark: #ffffff; --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333; --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0; --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px; --rounded-md: 11px; --rounded-lg: 18px; --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); background: var(--color-canvas); -webkit-font-smoothing: antialiased; }
+
+    .global-nav { position: sticky; top: 0; z-index: 100; height: 44px; background: var(--color-surface-black); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .global-nav__logo { font-size: 21px; font-weight: 600; color: #fff; letter-spacing: 0.231px; text-decoration: none; }
+    .global-nav__links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .global-nav__links a { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: -0.12px; text-decoration: none; }
+    .global-nav__links a:hover { color: #fff; }
+    .sub-nav { position: sticky; top: 44px; z-index: 99; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .sub-nav__breadcrumb { display: flex; align-items: center; gap: 6px; }
+    .sub-nav__breadcrumb a { font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .sub-nav__breadcrumb span { font-size: 14px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+    .sub-nav__progress { display: flex; align-items: center; gap: 12px; }
+    .progress-label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .progress-bar { width: 80px; height: 4px; background: var(--color-hairline); border-radius: var(--rounded-pill); overflow: hidden; }
+    .progress-bar__fill { height: 100%; width: 83.33%; background: var(--color-primary); border-radius: var(--rounded-pill); }
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 96px); max-width: 1280px; margin: 0 auto; }
+    .sidebar { position: sticky; top: 96px; height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--color-hairline); padding: 32px 0; background: var(--color-canvas); }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+    .sidebar__nav { list-style: none; margin-bottom: 32px; }
+    .sidebar__nav li a { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 14px; font-weight: 400; color: var(--color-ink-muted-48); letter-spacing: -0.224px; text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active { color: var(--color-primary); font-weight: 600; background: rgba(0,102,204,0.06); }
+    .sidebar__nav li a .nav-num { font-size: 11px; color: var(--color-ink-muted-48); min-width: 20px; }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-hairline); margin-left: auto; flex-shrink: 0; }
+    .sidebar__nav li a.done .nav-check { background: var(--color-primary); border-color: var(--color-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+    .article { padding: 64px 72px 120px; max-width: 760px; }
+    .article__eyebrow { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .article__title { font-size: 40px; font-weight: 600; line-height: 1.10; letter-spacing: 0; color: var(--color-ink); margin-bottom: 16px; }
+    .article__lead { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-ink-muted-48); margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--color-hairline); }
+    .prose h2 { font-size: 28px; font-weight: 600; line-height: 1.14; letter-spacing: 0.196px; color: var(--color-ink); margin: 56px 0 16px; }
+    .prose h3 { font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; color: var(--color-ink); margin: 40px 0 12px; }
+    .prose p { font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); margin-bottom: 20px; }
+    .prose strong { font-weight: 600; }
+    .callout { background: var(--color-canvas-parchment); border-left: 3px solid var(--color-primary); border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0; padding: 20px 24px; margin: 32px 0; }
+    .callout__label { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout p { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin: 0; }
+    .callout .callout__label { color: var(--color-primary); }
+    .key-point { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; text-align: center; }
+    .key-point__quote { font-size: 24px; font-weight: 300; line-height: 1.5; margin-bottom: 16px; }
+    .key-point__attr { font-size: 14px; font-weight: 400; letter-spacing: -0.224px; }
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .token-name { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); }
+    .exercise { background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; }
+    .exercise__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-primary); background: rgba(0,102,204,0.1); padding: 4px 12px; border-radius: var(--rounded-pill); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+    .exercise__title { font-size: 21px; font-weight: 600; color: var(--color-ink); letter-spacing: 0.231px; margin-bottom: 12px; }
+    .exercise__desc { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin-bottom: 20px; }
+    .exercise__steps { list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+    .exercise__steps li { display: flex; gap: 12px; font-size: 14px; color: var(--color-ink); line-height: 1.43; letter-spacing: -0.224px; counter-increment: step; }
+    .exercise__steps li::before { content: counter(step); width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0 0; border-top: 1px solid var(--color-hairline); margin-top: 80px; }
+    .module-nav__btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__center { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .code-block { background: var(--color-surface-tile-1); border-radius: var(--rounded-sm); padding: 20px 24px; margin: 20px 0; font-family: 'SF Mono','Fira Code',monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; color: #e8e8ed; }
+
+    /* ── Contrast checker ─────────────────── */
+    .contrast-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+    .contrast-card { border-radius: var(--rounded-lg); overflow: hidden; border: 1px solid var(--color-hairline); }
+    .contrast-card__swatch { padding: 20px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 600; letter-spacing: -0.374px; min-height: 72px; }
+    .contrast-card__info { padding: 12px 16px; background: var(--color-canvas-parchment); display: flex; flex-direction: column; gap: 4px; }
+    .contrast-card__ratio { font-size: 20px; font-weight: 600; color: var(--color-ink); }
+    .contrast-card__label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .contrast-pass { color: #1a8a3a; }
+    .contrast-fail { color: #c5221f; }
+
+    /* ── Focus ring demo ──────────────────── */
+    .focus-demo { display: flex; gap: 20px; flex-wrap: wrap; padding: 24px; background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); margin: 24px 0; }
+    .focus-bad  { outline: none; display: inline-flex; align-items: center; padding: 10px 20px; border-radius: 9999px; background: var(--color-primary); color: #fff; font-size: 17px; border: none; }
+    .focus-good { outline: 3px solid var(--color-primary-focus); outline-offset: 3px; display: inline-flex; align-items: center; padding: 10px 20px; border-radius: 9999px; background: var(--color-primary); color: #fff; font-size: 17px; border: none; }
+
+    /* ── WCAG table ────────────────────────── */
+    .wcag-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .wcag-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .wcag-table td { padding: 10px 12px; font-size: 13px; color: var(--color-ink); border-bottom: 1px solid var(--color-divider-soft); vertical-align: top; }
+    .wcag-table tr:last-child td { border-bottom: none; }
+    .badge-pass { display:inline-block; background:rgba(26,138,58,0.1); color:#1a8a3a; font-size:11px; font-weight:600; padding:2px 8px; border-radius:9999px; }
+    .badge-aa   { display:inline-block; background:rgba(0,102,204,0.1); color:var(--color-primary); font-size:11px; font-weight:600; padding:2px 8px; border-radius:9999px; }
+    .badge-aaa  { display:inline-block; background:rgba(234,179,8,0.1); color:#b45309; font-size:11px; font-weight:600; padding:2px 8px; border-radius:9999px; }
+
+    /* ── Alt text demo ─────────────────────── */
+    .alt-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .alt-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .alt-table td { padding: 10px 12px; font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: top; line-height: 1.5; }
+    .alt-table tr:last-child td { border-bottom: none; }
+    .alt-bad  { color: #c5221f; font-style: italic; }
+    .alt-good { color: #1a8a3a; font-style: italic; }
+
+    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .article { padding: 40px 24px 80px; } .contrast-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a><span>›</span><span>Module 10</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">10 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 10</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro"    class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#wcag"    ><span class="nav-num">2.</span> WCAGとApple<div class="nav-check"></div></a></li>
+        <li><a href="#contrast"><span class="nav-num">3.</span> カラーコントラスト<div class="nav-check"></div></a></li>
+        <li><a href="#focus"   ><span class="nav-num">4.</span> フォーカス管理<div class="nav-check"></div></a></li>
+        <li><a href="#semantic"><span class="nav-num">5.</span> セマンティックHTML<div class="nav-check"></div></a></li>
+        <li><a href="#alt"     ><span class="nav-num">6.</span> alt テキスト<div class="nav-check"></div></a></li>
+        <li><a href="#aria"    ><span class="nav-num">7.</span> ARIA とスクリーンリーダー<div class="nav-check"></div></a></li>
+        <li><a href="#exercise"><span class="nav-num">8.</span> 演習<div class="nav-check"></div></a></li>
+      </ul>
+      <p class="sidebar__section-label">モジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-09.html" class="done"><span class="nav-num">09.</span> モーション<div class="nav-check"></div></a></li>
+        <li><a href="module-10.html" class="active"><span class="nav-num">10.</span> アクセシビリティ<div class="nav-check"></div></a></li>
+        <li><a href="module-11.html"><span class="nav-num">11.</span> コンテンツ設計<div class="nav-check"></div></a></li>
+        <li><a href="module-12.html"><span class="nav-num">12.</span> 総合プロジェクト<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <article class="article">
+        <p class="article__eyebrow">Module 10 · アクセシビリティ</p>
+        <h1 class="article__title">アクセシビリティ</h1>
+        <p class="article__lead">Appleはアクセシビリティを「義務」ではなく<strong>デザインの完成度</strong>として扱う。すべての人が使えることが、すべての人にとって良いデザインだ。</p>
+
+        <section id="intro" class="prose">
+          <h2>なぜアクセシビリティが「品質」なのか</h2>
+          <p>アクセシビリティを「障害者向けの追加対応」と捉えるのは誤りだ。日本では高齢者人口が28%を超えており、視力低下・手の震え・認知的疲労を持つユーザーは全人口の多数を占める。</p>
+          <p>Appleがアクセシビリティに投資し続ける理由は明確だ。<strong>アクセシブルなデザインは、すべてのユーザーにとって使いやすいデザインと一致する</strong>からだ。コントラスト比が高いテキストは、晴天下でiPhoneを使うユーザーにも読みやすい。</p>
+          <div class="key-point">
+            <p class="key-point__quote">アクセシビリティは<br>デザインの制約ではなく、<br>デザインの完成を確認する基準だ。</p>
+            <p class="key-point__attr">Apple Accessibility — Design for Everyone</p>
+          </div>
+        </section>
+
+        <section id="wcag" class="prose">
+          <h2>WCAGとAppleの関係</h2>
+          <p>WCAG（Web Content Accessibility Guidelines）はアクセシビリティの国際基準だ。Appleのウェブプロパティは<strong>WCAG 2.1 AA</strong>を目標として設計されている。</p>
+
+          <table class="wcag-table">
+            <thead><tr><th>レベル</th><th>コントラスト比（通常テキスト）</th><th>コントラスト比（大テキスト）</th><th>Appleの対応</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="badge-pass">A</span></td>
+                <td>なし（規定なし）</td>
+                <td>なし</td>
+                <td>最低限</td>
+              </tr>
+              <tr>
+                <td><span class="badge-aa">AA</span></td>
+                <td>4.5 : 1 以上</td>
+                <td>3 : 1 以上</td>
+                <td><strong>目標基準</strong></td>
+              </tr>
+              <tr>
+                <td><span class="badge-aaa">AAA</span></td>
+                <td>7 : 1 以上</td>
+                <td>4.5 : 1 以上</td>
+                <td>主要テキストは多くがこれを達成</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>大テキストの定義：18pt（24px）以上、または14pt（18.67px）以上のボールド体。design.mdのtype scaleではdisplay-sm（21px）以上が「大テキスト」に該当する。</p>
+        </section>
+
+        <section id="contrast" class="prose">
+          <h2>カラーコントラスト</h2>
+          <p>design.mdのカラーパレットがどのようなコントラスト比を持つか確認する。</p>
+
+          <div class="contrast-grid">
+            <div class="contrast-card">
+              <div class="contrast-card__swatch" style="background:#1d1d1f; color:#ffffff;">#1d1d1f 上の白</div>
+              <div class="contrast-card__info">
+                <div class="contrast-card__ratio contrast-pass">16.1 : 1</div>
+                <div class="contrast-card__label">見出し・本文テキスト — AAA <span class="badge-pass">✓</span></div>
+              </div>
+            </div>
+            <div class="contrast-card">
+              <div class="contrast-card__swatch" style="background:#ffffff; color:#1d1d1f;">#ffffff 上の ink</div>
+              <div class="contrast-card__info">
+                <div class="contrast-card__ratio contrast-pass">16.1 : 1</div>
+                <div class="contrast-card__label">ライト背景本文 — AAA <span class="badge-pass">✓</span></div>
+              </div>
+            </div>
+            <div class="contrast-card">
+              <div class="contrast-card__swatch" style="background:#ffffff; color:#0066cc;">白上の primary</div>
+              <div class="contrast-card__info">
+                <div class="contrast-card__ratio contrast-pass">5.74 : 1</div>
+                <div class="contrast-card__label">リンク・CTA — AA <span class="badge-aa">✓</span></div>
+              </div>
+            </div>
+            <div class="contrast-card">
+              <div class="contrast-card__swatch" style="background:#272729; color:#2997ff;">ダーク上の on-dark</div>
+              <div class="contrast-card__info">
+                <div class="contrast-card__ratio contrast-pass">5.81 : 1</div>
+                <div class="contrast-card__label">ダークタイルリンク — AA <span class="badge-aa">✓</span></div>
+              </div>
+            </div>
+            <div class="contrast-card">
+              <div class="contrast-card__swatch" style="background:#ffffff; color:#7a7a7a;">白上の muted</div>
+              <div class="contrast-card__info">
+                <div class="contrast-card__ratio contrast-fail">4.48 : 1</div>
+                <div class="contrast-card__label">補助テキスト — AA境界 <span class="badge-aa">✓ (大テキスト)</span></div>
+              </div>
+            </div>
+            <div class="contrast-card">
+              <div class="contrast-card__swatch" style="background:#f5f5f7; color:#0066cc;">parchment上のprimary</div>
+              <div class="contrast-card__info">
+                <div class="contrast-card__ratio contrast-pass">5.60 : 1</div>
+                <div class="contrast-card__label">parchment背景リンク — AA <span class="badge-aa">✓</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout">
+            <p class="callout__label">ink-muted-48 の扱い</p>
+            <p>#7a7a7a は白背景で約4.48:1のコントラスト比だ。WCAG AA（4.5:1）をわずかに下回る。そのためdesign.mdは ink-muted-48 を<strong>補助情報・キャプション・ラベル</strong>（=大テキスト扱いが多い文脈）に限定して使用する。本文テキストには使わない。</p>
+          </div>
+        </section>
+
+        <section id="focus" class="prose">
+          <h2>フォーカス管理</h2>
+          <p>キーボードのみでサイトを操作するユーザーにとって、フォーカスリングは「今どこにいるか」を示す唯一の手がかりだ。</p>
+
+          <div class="focus-demo">
+            <div>
+              <p style="font-size:12px; font-weight:600; color:var(--color-ink-muted-48); letter-spacing:0.3px; text-transform:uppercase; margin-bottom:10px;">誤り — outline:none</p>
+              <button class="focus-bad">詳しく見る</button>
+              <p style="font-size:11px; color:#c5221f; margin-top:8px;">キーボードユーザーが迷子になる</p>
+            </div>
+            <div>
+              <p style="font-size:12px; font-weight:600; color:var(--color-ink-muted-48); letter-spacing:0.3px; text-transform:uppercase; margin-bottom:10px;">正しい — outline visible</p>
+              <button class="focus-good">詳しく見る</button>
+              <p style="font-size:11px; color:#1a8a3a; margin-top:8px;">3px solid #0071e3 · offset 3px</p>
+            </div>
+          </div>
+
+          <div class="code-block" style="color:#e8e8ed;">/* フォーカスリング — Appleの実装 */
+:focus-visible {
+  outline: 3px solid var(--color-primary-focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* :focus ではなく :focus-visible を使う */
+/* マウスクリック時はフォーカスリングを非表示にし */
+/* キーボード操作時のみ表示する */</div>
+
+          <p><span class="token-name">:focus-visible</span> はモダンブラウザでサポートされており、<span class="token-name">:focus</span> と異なり「マウスクリック後のリング表示」を防ぎながら「キーボード操作時のリング表示」を維持する。</p>
+        </section>
+
+        <section id="semantic" class="prose">
+          <h2>セマンティックHTML</h2>
+          <p>スクリーンリーダーはHTMLの<strong>意味</strong>を読み上げる。<span class="token-name">&lt;div&gt;</span> のクリックハンドラはスクリーンリーダーに「ボタン」として認識されない。</p>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0;">
+            <div style="padding:16px 20px; border:2px solid #c5221f; border-radius:var(--rounded-sm); background:#fff5f5;">
+              <div style="font-size:11px; font-weight:600; color:#c5221f; letter-spacing:0.3px; text-transform:uppercase; margin-bottom:8px;">誤り</div>
+              <div style="font-family:monospace; font-size:12px; color:var(--color-ink); line-height:1.7;">&lt;div onclick="buy()"&gt;<br>&nbsp;&nbsp;購入する<br>&lt;/div&gt;</div>
+            </div>
+            <div style="padding:16px 20px; border:2px solid #1a8a3a; border-radius:var(--rounded-sm); background:#f0fff4;">
+              <div style="font-size:11px; font-weight:600; color:#1a8a3a; letter-spacing:0.3px; text-transform:uppercase; margin-bottom:8px;">正しい</div>
+              <div style="font-family:monospace; font-size:12px; color:var(--color-ink); line-height:1.7;">&lt;button type="button"<br>&nbsp;&nbsp;class="button-primary"<br>&nbsp;&nbsp;onclick="buy()"&gt;<br>&nbsp;&nbsp;購入する<br>&lt;/button&gt;</div>
+            </div>
+          </div>
+
+          <table class="wcag-table">
+            <thead><tr><th>要素</th><th>用途</th><th>スクリーンリーダー読み上げ</th></tr></thead>
+            <tbody>
+              <tr><td><span class="token-name">&lt;nav&gt;</span></td><td>ナビゲーション領域</td><td>「ナビゲーション、ランドマーク」</td></tr>
+              <tr><td><span class="token-name">&lt;main&gt;</span></td><td>ページのメインコンテンツ</td><td>「メイン、ランドマーク」</td></tr>
+              <tr><td><span class="token-name">&lt;button&gt;</span></td><td>アクションを起こすUI</td><td>「購入する、ボタン」</td></tr>
+              <tr><td><span class="token-name">&lt;a href&gt;</span></td><td>他URLへの遷移</td><td>「詳しく見る、リンク」</td></tr>
+              <tr><td><span class="token-name">&lt;h1〜h6&gt;</span></td><td>見出し階層</td><td>「iPhoneがやってきた、見出しレベル1」</td></tr>
+              <tr><td><span class="token-name">&lt;img alt&gt;</span></td><td>画像コンテンツ</td><td>alt属性のテキストを読み上げ</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="alt" class="prose">
+          <h2>alt テキスト</h2>
+          <p>画像のalt属性はスクリーンリーダーユーザーへの「画像の説明」だ。ただし、すべての画像にテキストを書けばよいわけではない。<strong>装飾画像は alt="" にする</strong>。</p>
+
+          <table class="alt-table">
+            <thead><tr><th>シーン</th><th>悪い例</th><th>良い例</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>製品写真</td>
+                <td class="alt-bad">"image001.jpg"</td>
+                <td class="alt-good">"iPhone 16 Pro — チタニウムブラック、斜め正面ビュー"</td>
+              </tr>
+              <tr>
+                <td>アイコン付きボタン</td>
+                <td class="alt-bad">"アイコン"</td>
+                <td class="alt-good">aria-label="カートに追加"（imgはalt=""）</td>
+              </tr>
+              <tr>
+                <td>背景装飾</td>
+                <td class="alt-bad">"blue gradient background"</td>
+                <td class="alt-good">alt=""（装飾はalt空）</td>
+              </tr>
+              <tr>
+                <td>ロゴ</td>
+                <td class="alt-bad">"logo"</td>
+                <td class="alt-good">"Apple"（社名そのもの）</td>
+              </tr>
+              <tr>
+                <td>グラフ・図解</td>
+                <td class="alt-bad">"グラフ"</td>
+                <td class="alt-good">"パフォーマンス比較グラフ：M4は前世代比40%高速"</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="aria" class="prose">
+          <h2>ARIAとスクリーンリーダー</h2>
+          <p>ARIAはHTMLの意味を補完するための属性セットだ。セマンティックHTMLで解決できる場合はARIAを使う必要はない。<strong>ARIAはセマンティックHTMLの代替ではなく補完だ。</strong></p>
+
+          <div style="display:flex; flex-direction:column; gap:12px; margin:24px 0;">
+            <div style="display:grid; grid-template-columns:180px 1fr; gap:16px; padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm);">
+              <span style="font-family:monospace; font-size:12px; color:var(--color-primary);">aria-label</span>
+              <span style="font-size:13px; color:var(--color-ink); line-height:1.5;">ボタンのテキストが視覚的アイコンのみの場合に読み上げラベルを提供。例: aria-label="カートに追加"</span>
+            </div>
+            <div style="display:grid; grid-template-columns:180px 1fr; gap:16px; padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm);">
+              <span style="font-family:monospace; font-size:12px; color:var(--color-primary);">aria-hidden</span>
+              <span style="font-size:13px; color:var(--color-ink); line-height:1.5;">スクリーンリーダーから要素を隠す。装飾アイコン・繰り返しコンテンツに使用。例: aria-hidden="true"</span>
+            </div>
+            <div style="display:grid; grid-template-columns:180px 1fr; gap:16px; padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm);">
+              <span style="font-family:monospace; font-size:12px; color:var(--color-primary);">aria-expanded</span>
+              <span style="font-size:13px; color:var(--color-ink); line-height:1.5;">開閉可能なパネルの状態を示す。例: ハンバーガーメニューが開いているとき aria-expanded="true"</span>
+            </div>
+            <div style="display:grid; grid-template-columns:180px 1fr; gap:16px; padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm);">
+              <span style="font-family:monospace; font-size:12px; color:var(--color-primary);">aria-live</span>
+              <span style="font-size:13px; color:var(--color-ink); line-height:1.5;">動的に更新されるコンテンツをスクリーンリーダーに通知。例: フォームのエラーメッセージ領域に aria-live="polite"</span>
+            </div>
+          </div>
+
+          <div class="callout">
+            <p class="callout__label">スクリーンリーダーでテストする</p>
+            <p>Macに標準搭載されているVoiceOver（⌘＋F5 または Fn＋⌘＋F5）でページを操作してみることが最良のテストだ。Tab キーでフォーカスを移動し、すべての操作が音声だけで完結できるか確認する。</p>
+          </div>
+        </section>
+
+        <section id="exercise">
+          <div class="exercise">
+            <span class="exercise__badge">演習</span>
+            <h2 class="exercise__title">アクセシビリティ監査の実施</h2>
+            <p class="exercise__desc">あなたの手元のHTMLページまたはapple.comを対象に、アクセシビリティ監査を実施してください。</p>
+            <ol class="exercise__steps">
+              <li>ChromeのDevTools「Lighthouse」タブを開き、アクセシビリティスコアを計測する。スコアと問題の一覧をメモする。</li>
+              <li>Tabキーのみでページ全体を操作する。フォーカスリングが消えるか、操作できない要素があるかを記録する。</li>
+              <li>MacのVoiceOver（⌘＋F5）を起動し、主要なCTAボタンを音声で操作する。適切なラベルが読み上げられるか確認する。</li>
+              <li>WebAIM Contrast Checkerで自分のデザインの主要3色ペアのコントラスト比を計測し、AAをすべて通過させる。</li>
+              <li>発見した問題を修正し、修正前後のLighthouseスコアをコミュニティに投稿する。</li>
+            </ol>
+          </div>
+        </section>
+
+        <nav class="module-nav">
+          <a class="module-nav__btn" href="module-09.html">← Module 09</a>
+          <span class="module-nav__center">Module 10 / 12</span>
+          <a class="module-nav__btn" href="module-11.html">Module 11 →</a>
+        </nav>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

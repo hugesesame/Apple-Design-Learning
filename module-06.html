@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 06 — エレベーションと奥行き | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-primary: #0066cc; --color-primary-focus: #0071e3; --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff; --color-canvas-parchment: #f5f5f7; --color-surface-pearl: #fafafc;
+      --color-surface-tile-1: #272729; --color-surface-black: #000000;
+      --color-ink: #1d1d1f; --color-body-on-dark: #ffffff; --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333; --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0; --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px; --rounded-md: 11px; --rounded-lg: 18px; --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); background: var(--color-canvas); -webkit-font-smoothing: antialiased; }
+    .global-nav { position: sticky; top: 0; z-index: 100; height: 44px; background: var(--color-surface-black); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .global-nav__logo { font-size: 21px; font-weight: 600; color: #fff; letter-spacing: 0.231px; text-decoration: none; }
+    .global-nav__links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .global-nav__links a { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: -0.12px; text-decoration: none; }
+    .global-nav__links a:hover { color: #fff; }
+    .sub-nav { position: sticky; top: 44px; z-index: 99; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .sub-nav__breadcrumb { display: flex; align-items: center; gap: 6px; }
+    .sub-nav__breadcrumb a { font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .sub-nav__breadcrumb span { font-size: 14px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+    .sub-nav__progress { display: flex; align-items: center; gap: 12px; }
+    .progress-label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .progress-bar { width: 80px; height: 4px; background: var(--color-hairline); border-radius: var(--rounded-pill); overflow: hidden; }
+    .progress-bar__fill { height: 100%; width: 50%; background: var(--color-primary); border-radius: var(--rounded-pill); }
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 96px); max-width: 1280px; margin: 0 auto; }
+    .sidebar { position: sticky; top: 96px; height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--color-hairline); padding: 32px 0; background: var(--color-canvas); }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+    .sidebar__nav { list-style: none; margin-bottom: 32px; }
+    .sidebar__nav li a { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 14px; font-weight: 400; color: var(--color-ink-muted-48); letter-spacing: -0.224px; text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active { color: var(--color-primary); font-weight: 600; background: rgba(0,102,204,0.06); }
+    .sidebar__nav li a .nav-num { font-size: 11px; color: var(--color-ink-muted-48); min-width: 20px; }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-hairline); margin-left: auto; flex-shrink: 0; }
+    .sidebar__nav li a.done .nav-check { background: var(--color-primary); border-color: var(--color-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+    .article { padding: 64px 72px 120px; max-width: 760px; }
+    .article__eyebrow { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .article__title { font-size: 40px; font-weight: 600; line-height: 1.10; letter-spacing: 0; color: var(--color-ink); margin-bottom: 16px; }
+    .article__lead { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-ink-muted-48); margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--color-hairline); }
+    .prose h2 { font-size: 28px; font-weight: 600; line-height: 1.14; letter-spacing: 0.196px; color: var(--color-ink); margin: 56px 0 16px; }
+    .prose h3 { font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; color: var(--color-ink); margin: 40px 0 12px; }
+    .prose p { font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); margin-bottom: 20px; }
+    .prose strong { font-weight: 600; }
+    .callout { background: var(--color-canvas-parchment); border-left: 3px solid var(--color-primary); border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0; padding: 20px 24px; margin: 32px 0; }
+    .callout__label { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout p { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin: 0; }
+    .callout .callout__label { color: var(--color-primary); }
+    .key-point { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; text-align: center; }
+    .key-point__quote { font-size: 24px; font-weight: 300; line-height: 1.5; margin-bottom: 16px; }
+    .key-point__attr { font-size: 14px; font-weight: 400; letter-spacing: -0.224px; }
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .token-name { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); }
+    .exercise { background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; }
+    .exercise__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-primary); background: rgba(0,102,204,0.1); padding: 4px 12px; border-radius: var(--rounded-pill); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+    .exercise__title { font-size: 21px; font-weight: 600; color: var(--color-ink); letter-spacing: 0.231px; margin-bottom: 12px; }
+    .exercise__desc { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin-bottom: 20px; }
+    .exercise__steps { list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+    .exercise__steps li { display: flex; gap: 12px; font-size: 14px; color: var(--color-ink); line-height: 1.43; letter-spacing: -0.224px; counter-increment: step; }
+    .exercise__steps li::before { content: counter(step); width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0 0; border-top: 1px solid var(--color-hairline); margin-top: 80px; }
+    .module-nav__btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__center { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+
+    /* ── Elevation level cards ─────────────────── */
+    .elev-stack { display: flex; flex-direction: column; gap: 2px; margin: 32px 0; }
+    .elev-level { display: grid; grid-template-columns: 180px 1fr 180px; align-items: center; gap: 20px; padding: 20px 24px; border-radius: var(--rounded-sm); border: 1px solid var(--color-hairline); }
+    .elev-level__name { font-size: 14px; font-weight: 600; color: var(--color-ink); letter-spacing: -0.224px; }
+    .elev-level__spec { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: var(--color-ink-muted-48); line-height: 1.7; }
+    .elev-level__demo { display: flex; justify-content: center; }
+    .elev-level--frosted { background: rgba(245,245,247,0.85); backdrop-filter: blur(20px); }
+
+    /* ── Frosted glass demo ─────────────────────── */
+    .frosted-demo { position: relative; border-radius: var(--rounded-lg); overflow: hidden; margin: 24px 0; height: 180px; }
+    .frosted-demo__bg { position: absolute; inset: 0; display: flex; align-items: stretch; }
+    .frosted-demo__bg-block { flex: 1; }
+    .frosted-demo__panel { position: absolute; bottom: 0; left: 0; right: 0; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
+    .frosted-demo__text { font-size: 14px; font-weight: 600; color: var(--color-ink); letter-spacing: -0.224px; }
+
+    /* ── Shadow demo ────────────────────────────── */
+    .shadow-demo { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin: 32px 0; }
+    .shadow-card { padding: 24px; border-radius: var(--rounded-lg); background: var(--color-canvas-parchment); display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .shadow-card__obj { width: 80px; height: 80px; border-radius: var(--rounded-md); background: #d1d1d6; }
+    .shadow-card__label { font-size: 12px; font-weight: 600; color: var(--color-ink); letter-spacing: -0.12px; }
+    .shadow-card__spec { font-family: monospace; font-size: 10px; color: var(--color-ink-muted-48); text-align: center; line-height: 1.6; }
+
+    /* ── Color elevation table ──────────────────── */
+    .elev-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .elev-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .elev-table td { padding: 10px 12px; font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: middle; }
+    .elev-table tr:last-child td { border-bottom: none; }
+    .color-swatch-sm { display: inline-block; width: 24px; height: 24px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.08); vertical-align: middle; margin-right: 8px; }
+
+    /* ── Hairline demo ──────────────────────────── */
+    .hairline-demo { margin: 24px 0; border: 1px solid var(--color-hairline); border-radius: var(--rounded-lg); overflow: hidden; }
+    .hairline-demo__zone { padding: 16px 20px; font-size: 14px; color: var(--color-ink); letter-spacing: -0.224px; }
+    .hairline-demo__zone + .hairline-demo__zone { border-top: 1px solid var(--color-hairline); }
+    .hairline-demo__sep { height: 1px; background: var(--color-hairline); }
+
+    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .article { padding: 40px 24px 80px; } .elev-level { grid-template-columns: 1fr; } .shadow-demo { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a><span>›</span><span>Module 06</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">6 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 06</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro"    class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#levels"  ><span class="nav-num">2.</span> エレベーション4段階<div class="nav-check"></div></a></li>
+        <li><a href="#flat"    ><span class="nav-num">3.</span> フラット — 影ゼロ<div class="nav-check"></div></a></li>
+        <li><a href="#hairline"><span class="nav-num">4.</span> ヘアラインとボーダー<div class="nav-check"></div></a></li>
+        <li><a href="#frosted" ><span class="nav-num">5.</span> Frosted Glass<div class="nav-check"></div></a></li>
+        <li><a href="#product" ><span class="nav-num">6.</span> プロダクトシャドウ<div class="nav-check"></div></a></li>
+        <li><a href="#color-elev"><span class="nav-num">7.</span> カラーによるエレベーション<div class="nav-check"></div></a></li>
+        <li><a href="#exercise"><span class="nav-num">8.</span> 演習<div class="nav-check"></div></a></li>
+      </ul>
+      <p class="sidebar__section-label">モジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-05.html" class="done"><span class="nav-num">05.</span> コンポーネント<div class="nav-check"></div></a></li>
+        <li><a href="module-06.html" class="active"><span class="nav-num">06.</span> エレベーション<div class="nav-check"></div></a></li>
+        <li><a href="module-07.html"><span class="nav-num">07.</span> レスポンシブ<div class="nav-check"></div></a></li>
+        <li><a href="module-08.html"><span class="nav-num">08.</span> トークン実装<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <article class="article">
+        <p class="article__eyebrow">Module 06 · エレベーション</p>
+        <h1 class="article__title">エレベーションと奥行き</h1>
+        <p class="article__lead">Appleは影を恐れるほど使わない。奥行きを作る手段は<strong>影ではなくカラーと素材</strong>だ——その哲学を徹底的に理解する。</p>
+
+        <section id="intro" class="prose">
+          <h2>「影=奥行き」ではない</h2>
+          <p>多くのデザインシステムが「高い要素ほど強い影を持つ」という原則を採用する（Material Design など）。しかしAppleのアプローチはまったく逆だ。</p>
+          <p>apple.comで使われる影は<strong>1種類だけ</strong>。製品レンダリング（3DCGや写真）に現実世界の光源をシミュレートするためだけに使う。UIの階層を伝えるために影を使う場面は存在しない。</p>
+          <div class="callout">
+            <p class="callout__label">核心原則</p>
+            <p>UIコンポーネントに shadow を使うな。奥行きはサーフェスカラーの変化・半透明・ヘアラインの3手段で表現せよ。</p>
+          </div>
+        </section>
+
+        <section id="levels" class="prose">
+          <h2>エレベーション4段階</h2>
+          <p>design.mdはエレベーションを4つのレベルで整理している。</p>
+          <div class="elev-stack">
+            <div class="elev-level" style="background:#fff;">
+              <div>
+                <div class="elev-level__name">Level 0 — Flat</div>
+                <div class="elev-level__spec">shadow: none<br>border: none<br>全面タイル・フッター・グローバルナビ</div>
+              </div>
+              <div class="elev-level__demo">
+                <div style="width:72px; height:44px; background:#000; border-radius:4px;"></div>
+              </div>
+              <div style="font-size:12px; color:var(--color-ink-muted-48);">border-radiusゼロが多い。ページの床面。</div>
+            </div>
+            <div class="elev-level" style="background:#fff;">
+              <div>
+                <div class="elev-level__name">Level 1 — Hairline</div>
+                <div class="elev-level__spec">border: 1px solid #e0e0e0<br>Utility Card・テーブル・セパレータ</div>
+              </div>
+              <div class="elev-level__demo">
+                <div style="width:72px; height:44px; background:#fff; border:1px solid #e0e0e0; border-radius:8px;"></div>
+              </div>
+              <div style="font-size:12px; color:var(--color-ink-muted-48);">影なしで「浮いているように見える」最小手段。</div>
+            </div>
+            <div class="elev-level elev-level--frosted" style="background:rgba(245,245,247,0.85);">
+              <div>
+                <div class="elev-level__name">Level 2 — Frosted</div>
+                <div class="elev-level__spec">backdrop-filter: saturate(180%) blur(20px)<br>bg: parchment @ 80%<br>Sub Nav・Floating Sticky Bar</div>
+              </div>
+              <div class="elev-level__demo">
+                <div style="width:72px; height:44px; background:rgba(245,245,247,0.72); border-radius:8px; border:1px solid rgba(0,0,0,0.06);"></div>
+              </div>
+              <div style="font-size:12px; color:var(--color-ink-muted-48);">「ガラス越しに後ろが見える」素材効果で浮遊感。</div>
+            </div>
+            <div class="elev-level" style="background:var(--color-canvas-parchment);">
+              <div>
+                <div class="elev-level__name">Level 3 — Product Shadow</div>
+                <div class="elev-level__spec">box-shadow: rgba(0,0,0,0.22)<br>3px 5px 30px 0<br>製品PNG/レンダリングのみ</div>
+              </div>
+              <div class="elev-level__demo">
+                <div style="width:72px; height:44px; background:#d1d1d6; border-radius:8px; box-shadow:rgba(0,0,0,0.22) 3px 5px 30px 0;"></div>
+              </div>
+              <div style="font-size:12px; color:var(--color-ink-muted-48);">製品の物理的存在感を演出。UIには絶対に使わない。</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="flat" class="prose">
+          <h2>Level 0 — フラット</h2>
+          <p>Appleの全面タイルは<strong>完全にフラット</strong>だ。ナビゲーション・フッター・コンテンツタイルはすべて影もボーダーも持たない。</p>
+          <p>なぜ浮いて見えるのか？答えは<strong>背景色の差異だけ</strong>。白いセクションの隣にグレー（<span class="token-name">{colors.canvas-parchment}</span>）または黒（<span class="token-name">{colors.surface-tile-1}</span>）のセクションが来ることで、人間の視覚系が自動的に奥行きを認識する。</p>
+
+          <div style="margin:24px 0; border-radius:var(--rounded-lg); overflow:hidden; border:1px solid var(--color-hairline);">
+            <div style="background:#fff; padding:24px 20px; text-align:center;">
+              <div style="font-size:13px; color:var(--color-ink-muted-48);">白 — canvas #ffffff</div>
+            </div>
+            <div style="background:#f5f5f7; padding:24px 20px; text-align:center;">
+              <div style="font-size:13px; color:var(--color-ink-muted-48);">グレー — parchment #f5f5f7</div>
+            </div>
+            <div style="background:#272729; padding:24px 20px; text-align:center;">
+              <div style="font-size:13px; color:#ccc;">ダーク — tile-1 #272729</div>
+            </div>
+            <div style="background:#fff; padding:24px 20px; text-align:center;">
+              <div style="font-size:13px; color:var(--color-ink-muted-48);">白 — canvas #ffffff（再び）</div>
+            </div>
+          </div>
+          <p>影ゼロ。しかし目は奥行きを感じる。<strong>これがAppleのエレベーション哲学の核心だ。</strong></p>
+        </section>
+
+        <section id="hairline" class="prose">
+          <h2>Level 1 — ヘアラインとボーダー</h2>
+          <p><strong>1px のボーダー</strong>は影よりはるかに繊細だ。UIが浮いていることを主張しすぎず、ただ「ここに境界がある」ことを告げる。</p>
+
+          <div class="hairline-demo">
+            <div class="hairline-demo__zone" style="font-weight:600; background:var(--color-canvas-parchment);">Store Utility Card</div>
+            <div class="hairline-demo__zone">商品名とサムネイル</div>
+            <div class="hairline-demo__zone">価格: ¥39,800</div>
+            <div class="hairline-demo__zone" style="color:var(--color-primary);">詳しく見る →</div>
+          </div>
+
+          <p>ボーダーは常に <span class="token-name">{colors.hairline}</span> (#e0e0e0) の1px。より薄い線（rgba）や2px以上の太い線は設計仕様に存在しない。</p>
+
+          <div class="callout">
+            <p class="callout__label">サブナビのヘアライン</p>
+            <p>Sub Navの下境界は <span class="token-name">rgba(0,0,0,0.08)</span> という半透明のヘアラインだ。frostedガラスの上に乗ることを考慮した、透過性のある境界線だ。</p>
+          </div>
+        </section>
+
+        <section id="frosted" class="prose">
+          <h2>Level 2 — Frosted Glass（磨りガラス）</h2>
+          <p>Appleの最も特徴的なエレベーション表現がFrosted Glassだ。スクロール時も半透明のパネルが浮遊しているように見え、コンテンツとの「距離感」が生まれる。</p>
+
+          <div class="frosted-demo">
+            <div class="frosted-demo__bg">
+              <div class="frosted-demo__bg-block" style="background:var(--color-surface-tile-1);"></div>
+              <div class="frosted-demo__bg-block" style="background:var(--color-primary); opacity:0.6;"></div>
+              <div class="frosted-demo__bg-block" style="background:var(--color-surface-tile-1);"></div>
+            </div>
+            <div class="frosted-demo__panel">
+              <div class="frosted-demo__text">Sub Navigation（Frosted Glass）</div>
+              <span style="font-size:14px; color:var(--color-primary); letter-spacing:-0.224px;">購入する</span>
+            </div>
+          </div>
+          <p style="font-size:12px; color:var(--color-ink-muted-48); text-align:center; margin-top:-12px;">下にコンテンツが透けて見えることで「ガラスが浮いている」感覚を生む</p>
+
+          <p>CSSの実装は正確に以下の値を使う。ぶれてはならない。</p>
+          <div style="background:var(--color-surface-tile-1); border-radius:var(--rounded-sm); padding:16px 20px; margin:16px 0; font-family:monospace; font-size:13px; color:#a8daff; line-height:1.7;">
+            background: rgba(245, 245, 247, 0.85);<br>
+            backdrop-filter: saturate(180%) blur(20px);<br>
+            -webkit-backdrop-filter: saturate(180%) blur(20px);<br>
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+          </div>
+
+          <p><strong>saturate(180%)</strong> が重要だ。単純なblurではなく、背景の彩度を高めることでガラスの素材感が増す。この値を省略してはならない。</p>
+        </section>
+
+        <section id="product" class="prose">
+          <h2>Level 3 — プロダクトシャドウ</h2>
+          <p>design.mdに記録されている唯一の box-shadow 値は <span class="token-name">{elevation.product-shadow}</span> だ。</p>
+
+          <div class="shadow-demo">
+            <div class="shadow-card">
+              <div class="shadow-card__obj" style="box-shadow:none;"></div>
+              <div class="shadow-card__label">影なし（誤）</div>
+              <div class="shadow-card__spec">製品が「ページに張り付いて」いるように見える</div>
+            </div>
+            <div class="shadow-card">
+              <div class="shadow-card__obj" style="box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>
+              <div class="shadow-card__label">汎用shadow（誤）</div>
+              <div class="shadow-card__spec">Material Design風。Appleの仕様に存在しない。</div>
+            </div>
+            <div class="shadow-card">
+              <div class="shadow-card__obj" style="box-shadow:rgba(0,0,0,0.22) 3px 5px 30px 0;"></div>
+              <div class="shadow-card__label">Product Shadow（正）</div>
+              <div class="shadow-card__spec">rgba(0,0,0,0.22)<br>3px 5px 30px 0</div>
+            </div>
+          </div>
+
+          <p>正しい値の特徴を分析すると：</p>
+          <ul style="margin:0 0 20px 20px; display:flex; flex-direction:column; gap:8px;">
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>X offset 3px</strong> — わずかに右。自然光（左上から）の模倣。</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>Y offset 5px</strong> — 小さな縦オフセット。浮遊感よりも「台の上に置いてある感」。</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>blur 30px</strong> — 大きくソフトなぼかし。スタジオ照明を模倣。</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>spread 0</strong> — 拡散なし。主張しすぎない。</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>opacity 0.22</strong> — 22%という低不透明度が上品さを保つ。</li>
+          </ul>
+
+          <div class="key-point">
+            <p class="key-point__quote">このshadowはUIコンポーネントには<br>一切使わない。製品ビジュアルだけだ。</p>
+            <p class="key-point__attr">カードに影を付けたくなったら、それはヘアラインで解決せよ。</p>
+          </div>
+        </section>
+
+        <section id="color-elev" class="prose">
+          <h2>カラーによるエレベーション</h2>
+          <p>UIの階層を影ではなくカラーで表現する方法を、改めて整理する。</p>
+
+          <table class="elev-table">
+            <thead><tr><th>カラー</th><th>トークン</th><th>用途・意味</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="color-swatch-sm" style="background:#ffffff;"></span>#ffffff</td>
+                <td><span class="token-name">{colors.canvas}</span></td>
+                <td>ベース面。ページの最下層。</td>
+              </tr>
+              <tr>
+                <td><span class="color-swatch-sm" style="background:#f5f5f7;"></span>#f5f5f7</td>
+                <td><span class="token-name">{colors.canvas-parchment}</span></td>
+                <td>第2層。features・testimonials等のセクション。わずかに持ち上がった印象。</td>
+              </tr>
+              <tr>
+                <td><span class="color-swatch-sm" style="background:#fafafc;"></span>#fafafc</td>
+                <td><span class="token-name">{colors.surface-pearl}</span></td>
+                <td>Pearl Button背景。white より1段上の「磨かれた白」。</td>
+              </tr>
+              <tr>
+                <td><span class="color-swatch-sm" style="background:#272729;"></span>#272729</td>
+                <td><span class="token-name">{colors.surface-tile-1}</span></td>
+                <td>ダークサーフェス。white との強いコントラストで奥行きを作る。</td>
+              </tr>
+              <tr>
+                <td><span class="color-swatch-sm" style="background:#000000;"></span>#000000</td>
+                <td><span class="token-name">{colors.surface-black}</span></td>
+                <td>グローバルナビ。最も高い「権威」を持つ面。</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>この5色のサーフェスカラーが、影を一切使わずに<strong>5段階の視覚的奥行き</strong>を作り出している。</p>
+        </section>
+
+        <section id="exercise">
+          <div class="exercise">
+            <span class="exercise__badge">演習</span>
+            <h2 class="exercise__title">エレベーション監査</h2>
+            <p class="exercise__desc">あなたの手元のデザイン（Figmaファイル、個人プロジェクト、あるいは任意のWebサイト）のエレベーション使用状況を監査してください。</p>
+            <ol class="exercise__steps">
+              <li>DevToolsまたはFigmaで、box-shadow が使われているすべての要素をリストアップする。</li>
+              <li>それぞれの shadow が「製品ビジュアルの現実感演出」なのか「UIの階層表現」なのかを分類する。</li>
+              <li>UIの階層表現に使われている shadow をすべてヘアライン（1px solid #e0e0e0）に置き換えてみる。見た目はどう変わるか？</li>
+              <li>Frosted Glass が使えるコンテキスト（スクロールで後ろにコンテンツが流れる固定パネル）を1箇所見つけて実装する。saturate(180%) を忘れずに。</li>
+              <li>置き換え前後のスクリーンショットを並べ、「どちらがAppleらしいか」をコミュニティに投稿する。</li>
+            </ol>
+          </div>
+        </section>
+
+        <nav class="module-nav">
+          <a class="module-nav__btn" href="module-05.html">← Module 05</a>
+          <span class="module-nav__center">Module 06 / 12</span>
+          <a class="module-nav__btn" href="module-07.html">Module 07 →</a>
+        </nav>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

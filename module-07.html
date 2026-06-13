@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 07 — レスポンシブ設計 | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-primary: #0066cc; --color-primary-focus: #0071e3; --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff; --color-canvas-parchment: #f5f5f7; --color-surface-pearl: #fafafc;
+      --color-surface-tile-1: #272729; --color-surface-black: #000000;
+      --color-ink: #1d1d1f; --color-body-on-dark: #ffffff; --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333; --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0; --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px; --rounded-md: 11px; --rounded-lg: 18px; --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); background: var(--color-canvas); -webkit-font-smoothing: antialiased; }
+    .global-nav { position: sticky; top: 0; z-index: 100; height: 44px; background: var(--color-surface-black); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .global-nav__logo { font-size: 21px; font-weight: 600; color: #fff; letter-spacing: 0.231px; text-decoration: none; }
+    .global-nav__links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .global-nav__links a { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: -0.12px; text-decoration: none; }
+    .global-nav__links a:hover { color: #fff; }
+    .sub-nav { position: sticky; top: 44px; z-index: 99; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .sub-nav__breadcrumb { display: flex; align-items: center; gap: 6px; }
+    .sub-nav__breadcrumb a { font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .sub-nav__breadcrumb span { font-size: 14px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+    .sub-nav__progress { display: flex; align-items: center; gap: 12px; }
+    .progress-label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .progress-bar { width: 80px; height: 4px; background: var(--color-hairline); border-radius: var(--rounded-pill); overflow: hidden; }
+    .progress-bar__fill { height: 100%; width: 58.33%; background: var(--color-primary); border-radius: var(--rounded-pill); }
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 96px); max-width: 1280px; margin: 0 auto; }
+    .sidebar { position: sticky; top: 96px; height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--color-hairline); padding: 32px 0; background: var(--color-canvas); }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+    .sidebar__nav { list-style: none; margin-bottom: 32px; }
+    .sidebar__nav li a { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 14px; font-weight: 400; color: var(--color-ink-muted-48); letter-spacing: -0.224px; text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active { color: var(--color-primary); font-weight: 600; background: rgba(0,102,204,0.06); }
+    .sidebar__nav li a .nav-num { font-size: 11px; color: var(--color-ink-muted-48); min-width: 20px; }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-hairline); margin-left: auto; flex-shrink: 0; }
+    .sidebar__nav li a.done .nav-check { background: var(--color-primary); border-color: var(--color-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+    .article { padding: 64px 72px 120px; max-width: 760px; }
+    .article__eyebrow { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .article__title { font-size: 40px; font-weight: 600; line-height: 1.10; letter-spacing: 0; color: var(--color-ink); margin-bottom: 16px; }
+    .article__lead { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-ink-muted-48); margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--color-hairline); }
+    .prose h2 { font-size: 28px; font-weight: 600; line-height: 1.14; letter-spacing: 0.196px; color: var(--color-ink); margin: 56px 0 16px; }
+    .prose h3 { font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; color: var(--color-ink); margin: 40px 0 12px; }
+    .prose p { font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); margin-bottom: 20px; }
+    .prose strong { font-weight: 600; }
+    .callout { background: var(--color-canvas-parchment); border-left: 3px solid var(--color-primary); border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0; padding: 20px 24px; margin: 32px 0; }
+    .callout__label { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout p { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin: 0; }
+    .callout .callout__label { color: var(--color-primary); }
+    .key-point { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; text-align: center; }
+    .key-point__quote { font-size: 24px; font-weight: 300; line-height: 1.5; margin-bottom: 16px; }
+    .key-point__attr { font-size: 14px; font-weight: 400; letter-spacing: -0.224px; }
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .token-name { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); }
+    .exercise { background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; }
+    .exercise__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-primary); background: rgba(0,102,204,0.1); padding: 4px 12px; border-radius: var(--rounded-pill); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+    .exercise__title { font-size: 21px; font-weight: 600; color: var(--color-ink); letter-spacing: 0.231px; margin-bottom: 12px; }
+    .exercise__desc { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin-bottom: 20px; }
+    .exercise__steps { list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+    .exercise__steps li { display: flex; gap: 12px; font-size: 14px; color: var(--color-ink); line-height: 1.43; letter-spacing: -0.224px; counter-increment: step; }
+    .exercise__steps li::before { content: counter(step); width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0 0; border-top: 1px solid var(--color-hairline); margin-top: 80px; }
+    .module-nav__btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__center { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+
+    /* ── Breakpoint table ──────────────────────── */
+    .bp-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .bp-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .bp-table td { padding: 10px 12px; font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: top; }
+    .bp-table tr:last-child td { border-bottom: none; }
+    .bp-badge { display: inline-block; padding: 2px 8px; border-radius: var(--rounded-pill); font-size: 11px; font-weight: 600; letter-spacing: 0.2px; }
+    .bp-badge--xl { background: rgba(0,102,204,0.12); color: var(--color-primary); }
+    .bp-badge--lg { background: rgba(0,102,204,0.08); color: var(--color-primary); }
+    .bp-badge--md { background: rgba(0,102,204,0.05); color: var(--color-primary); }
+    .bp-badge--sm { background: rgba(0,102,204,0.03); color: var(--color-primary); }
+
+    /* ── Container ruler ──────────────────────── */
+    .container-ruler { display: flex; flex-direction: column; gap: 8px; margin: 24px 0; }
+    .ruler-row { display: flex; align-items: center; gap: 12px; }
+    .ruler-bar { height: 12px; border-radius: 3px; background: var(--color-primary); opacity: 0.15; border-right: 2px solid var(--color-primary); position: relative; transition: width 0.3s; }
+    .ruler-label { font-size: 12px; color: var(--color-ink-muted-48); white-space: nowrap; min-width: 80px; text-align: right; }
+    .ruler-value { font-family: monospace; font-size: 11px; color: var(--color-primary); min-width: 60px; }
+
+    /* ── Column collapse diagram ──────────────── */
+    .collapse-demo { display: flex; flex-direction: column; gap: 20px; margin: 24px 0; }
+    .collapse-row { display: flex; flex-direction: column; gap: 8px; }
+    .collapse-row__label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; }
+    .collapse-row__grid { display: flex; gap: 4px; }
+    .collapse-row__col { flex: 1; height: 40px; border-radius: 4px; background: rgba(0,102,204,0.12); border: 1px solid rgba(0,102,204,0.2); }
+    .collapse-row__col--text { display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--color-primary); font-weight: 600; }
+
+    /* ── Touch target demo ────────────────────── */
+    .touch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0; }
+    .touch-card { border: 1px solid var(--color-hairline); border-radius: var(--rounded-lg); padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .touch-card__target { border-radius: var(--rounded-sm); background: rgba(0,102,204,0.1); border: 2px dashed rgba(0,102,204,0.3); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--color-primary); font-weight: 600; }
+
+    /* ── Type scale comparison ────────────────── */
+    .type-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0; }
+    .type-col { border: 1px solid var(--color-hairline); border-radius: var(--rounded-lg); padding: 20px; }
+    .type-col__label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+
+    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .article { padding: 40px 24px 80px; } .type-compare { grid-template-columns: 1fr; } .touch-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a><span>›</span><span>Module 07</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">7 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 07</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro"      class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#breakpoints"><span class="nav-num">2.</span> 8つのブレークポイント<div class="nav-check"></div></a></li>
+        <li><a href="#container"  ><span class="nav-num">3.</span> コンテナ幅の戦略<div class="nav-check"></div></a></li>
+        <li><a href="#collapse"   ><span class="nav-num">4.</span> グリッドの崩れ方<div class="nav-check"></div></a></li>
+        <li><a href="#type-scale" ><span class="nav-num">5.</span> タイポグラフィのスケーリング<div class="nav-check"></div></a></li>
+        <li><a href="#touch"      ><span class="nav-num">6.</span> タッチターゲット<div class="nav-check"></div></a></li>
+        <li><a href="#nav-collapse"><span class="nav-num">7.</span> ナビの折り畳み<div class="nav-check"></div></a></li>
+        <li><a href="#exercise"   ><span class="nav-num">8.</span> 演習<div class="nav-check"></div></a></li>
+      </ul>
+      <p class="sidebar__section-label">モジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-06.html" class="done"><span class="nav-num">06.</span> エレベーション<div class="nav-check"></div></a></li>
+        <li><a href="module-07.html" class="active"><span class="nav-num">07.</span> レスポンシブ<div class="nav-check"></div></a></li>
+        <li><a href="module-08.html"><span class="nav-num">08.</span> トークン実装<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <article class="article">
+        <p class="article__eyebrow">Module 07 · レスポンシブ</p>
+        <h1 class="article__title">レスポンシブ設計</h1>
+        <p class="article__lead">Appleのレスポンシブは「縮小」ではない。画面幅に応じてコンテンツの<strong>見せ方を再設計</strong>している——8つのブレークポイントがその設計言語だ。</p>
+
+        <section id="intro" class="prose">
+          <h2>「縮小」vs「再設計」</h2>
+          <p>よくある失敗パターンは「デスクトップをそのまま縮小する」アプローチだ。Appleはこれをしない。</p>
+          <p>例えばiPhone 15 Proのプロダクトページは、デスクトップ版と<strong>まったく異なるレイアウト構造</strong>を持つ。ヒーロービジュアルのアスペクト比、CTAの配置、フォントサイズの降下量、ナビゲーションの構造——すべてがモバイル専用に再設計されている。</p>
+
+          <div class="key-point">
+            <p class="key-point__quote">コンテンツを縮小するな。<br>そのコンテキストに合わせて再編集せよ。</p>
+            <p class="key-point__attr">これがAppleのレスポンシブ設計原則だ。</p>
+          </div>
+        </section>
+
+        <section id="breakpoints" class="prose">
+          <h2>8つのブレークポイント</h2>
+          <p>design.mdに記録されているブレークポイントは8つ。それぞれに意味がある。</p>
+
+          <table class="bp-table">
+            <thead><tr><th>幅</th><th>ラベル</th><th>対象デバイス</th><th>主な変化</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>1440px</strong></td>
+                <td><span class="bp-badge bp-badge--xl">XL</span></td>
+                <td>大型デスクトップ・iMac</td>
+                <td>コンテナが1068pxに固定され始める。横余白が広がる。</td>
+              </tr>
+              <tr>
+                <td><strong>1280px</strong></td>
+                <td><span class="bp-badge bp-badge--xl">LG</span></td>
+                <td>MacBook Pro 16"</td>
+                <td>グリッドが12col→8col へシフト開始の準備。</td>
+              </tr>
+              <tr>
+                <td><strong>1068px</strong></td>
+                <td><span class="bp-badge bp-badge--lg">MD+</span></td>
+                <td>MacBook Air 13"</td>
+                <td>最大コンテナ幅。Typography の hero-display が降下（56px→48px）。</td>
+              </tr>
+              <tr>
+                <td><strong>833px</strong></td>
+                <td><span class="bp-badge bp-badge--md">MD</span></td>
+                <td>iPad Air（横）</td>
+                <td>グリッド崩れ開始。サイドバーが消え、フッターが1列化。</td>
+              </tr>
+              <tr>
+                <td><strong>735px</strong></td>
+                <td><span class="bp-badge bp-badge--md">SM+</span></td>
+                <td>iPad mini（縦）</td>
+                <td>ストアグリッドが3col→2col。</td>
+              </tr>
+              <tr>
+                <td><strong>640px</strong></td>
+                <td><span class="bp-badge bp-badge--sm">SM</span></td>
+                <td>大型スマホ（横）</td>
+                <td>Typography hero-display が 40px。タイル padding が 60px→40px。</td>
+              </tr>
+              <tr>
+                <td><strong>419px</strong></td>
+                <td><span class="bp-badge bp-badge--sm">XS</span></td>
+                <td>iPhone SE / 標準</td>
+                <td>最小フォントサイズ。ストアグリッド1col。section padding 40px。</td>
+              </tr>
+              <tr>
+                <td><strong>375px</strong></td>
+                <td><span class="bp-badge bp-badge--sm">XXS</span></td>
+                <td>iPhone SE（3rd）</td>
+                <td>サイド余白が最小化。CTAが全幅になる場合がある。</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="container" class="prose">
+          <h2>コンテナ幅の戦略</h2>
+          <p>Appleのコンテナ幅は1種類ではない。<strong>コンテンツの性質</strong>によって異なるコンテナ幅を使い分ける。</p>
+
+          <div class="container-ruler">
+            <div class="ruler-row">
+              <div class="ruler-label">ナビゲーション</div>
+              <div class="ruler-bar" style="width:100%; opacity:0.2;"></div>
+              <div class="ruler-value">100%</div>
+            </div>
+            <div class="ruler-row">
+              <div class="ruler-label">ヒーロータイル</div>
+              <div class="ruler-bar" style="width:95%;"></div>
+              <div class="ruler-value">100%（余白付き）</div>
+            </div>
+            <div class="ruler-row">
+              <div class="ruler-label">製品コンテンツ</div>
+              <div class="ruler-bar" style="width:74%;"></div>
+              <div class="ruler-value">max 1068px</div>
+            </div>
+            <div class="ruler-row">
+              <div class="ruler-label">ストアグリッド</div>
+              <div class="ruler-bar" style="width:74%;"></div>
+              <div class="ruler-value">max 1068px</div>
+            </div>
+            <div class="ruler-row">
+              <div class="ruler-label">記事・散文</div>
+              <div class="ruler-bar" style="width:52%;"></div>
+              <div class="ruler-value">max 780px</div>
+            </div>
+            <div class="ruler-row">
+              <div class="ruler-label">フッター</div>
+              <div class="ruler-bar" style="width:85%;"></div>
+              <div class="ruler-value">max 1280px</div>
+            </div>
+          </div>
+
+          <div class="callout">
+            <p class="callout__label">重要</p>
+            <p>最大コンテナ幅の 1068px は design.md が「Responsive / container-max」として定義する数値だ。これ以上広げてはならない。広げると読者の視線移動距離が長くなりすぎ、Apple的な「余白の美学」が崩れる。</p>
+          </div>
+        </section>
+
+        <section id="collapse" class="prose">
+          <h2>グリッドの崩れ方</h2>
+          <p>Appleのグリッドは「コンテンツを隠す」ことなく崩れる。列数が減るにつれて、コンテンツは積み上がっていく。</p>
+
+          <div class="collapse-demo">
+            <div class="collapse-row">
+              <div class="collapse-row__label">1440px以上（4列）</div>
+              <div class="collapse-row__grid">
+                <div class="collapse-row__col collapse-row__col--text">1</div>
+                <div class="collapse-row__col collapse-row__col--text">2</div>
+                <div class="collapse-row__col collapse-row__col--text">3</div>
+                <div class="collapse-row__col collapse-row__col--text">4</div>
+              </div>
+            </div>
+            <div class="collapse-row">
+              <div class="collapse-row__label">833px〜（2列）</div>
+              <div class="collapse-row__grid">
+                <div class="collapse-row__col collapse-row__col--text" style="flex:2;">1 + 2</div>
+                <div class="collapse-row__col collapse-row__col--text" style="flex:2;">3 + 4</div>
+              </div>
+            </div>
+            <div class="collapse-row">
+              <div class="collapse-row__label">419px以下（1列）</div>
+              <div class="collapse-row__grid">
+                <div class="collapse-row__col collapse-row__col--text" style="flex:4; height:80px;">1 → 2 → 3 → 4（縦積み）</div>
+              </div>
+            </div>
+          </div>
+
+          <h3>アクセサリ・ストアグリッドの具体的崩れ方</h3>
+          <p>ストアのアクセサリグリッドは特に複雑な崩れ方をする。</p>
+          <div style="font-family:monospace; font-size:12px; background:var(--color-canvas-parchment); border-radius:var(--rounded-sm); padding:16px 20px; line-height:1.8; margin:16px 0; color:var(--color-ink-muted-80);">
+            @media (min-width: 1068px) → grid-template-columns: repeat(4, 1fr);<br>
+            @media (max-width: 1067px) → grid-template-columns: repeat(3, 1fr);<br>
+            @media (max-width: 735px)  → grid-template-columns: repeat(2, 1fr);<br>
+            @media (max-width: 419px)  → grid-template-columns: 1fr;
+          </div>
+        </section>
+
+        <section id="type-scale" class="prose">
+          <h2>タイポグラフィのスケーリング</h2>
+          <p>フォントサイズはビューポートの縮小に合わせて段階的に降下する。<strong>線形縮小ではなく、段階的に減少する</strong>点が重要だ。</p>
+
+          <div class="type-compare">
+            <div class="type-col">
+              <div class="type-col__label">デスクトップ（≥1068px）</div>
+              <div style="font-size:56px; font-weight:600; line-height:1.07; letter-spacing:-0.5px; color:var(--color-ink); margin-bottom:4px;">56</div>
+              <div style="font-size:11px; color:var(--color-ink-muted-48);">hero-display</div>
+              <div style="font-size:40px; font-weight:600; line-height:1.10; color:var(--color-ink); margin-top:16px; margin-bottom:4px;">40</div>
+              <div style="font-size:11px; color:var(--color-ink-muted-48);">display-lg</div>
+              <div style="font-size:28px; font-weight:600; line-height:1.14; color:var(--color-ink); margin-top:16px; margin-bottom:4px;">28</div>
+              <div style="font-size:11px; color:var(--color-ink-muted-48);">display-sm</div>
+            </div>
+            <div class="type-col">
+              <div class="type-col__label">モバイル（≤419px）</div>
+              <div style="font-size:36px; font-weight:600; line-height:1.10; letter-spacing:-0.3px; color:var(--color-ink); margin-bottom:4px;">36</div>
+              <div style="font-size:11px; color:var(--color-ink-muted-48);">hero-display → 36px</div>
+              <div style="font-size:28px; font-weight:600; line-height:1.10; color:var(--color-ink); margin-top:16px; margin-bottom:4px;">28</div>
+              <div style="font-size:11px; color:var(--color-ink-muted-48);">display-lg → 28px</div>
+              <div style="font-size:21px; font-weight:600; line-height:1.19; color:var(--color-ink); margin-top:16px; margin-bottom:4px;">21</div>
+              <div style="font-size:11px; color:var(--color-ink-muted-48);">display-sm → 21px</div>
+            </div>
+          </div>
+
+          <p>ボディテキストの17pxは<strong>モバイルでも変わらない</strong>。縮小対象になるのは見出し系のみだ。</p>
+        </section>
+
+        <section id="touch" class="prose">
+          <h2>タッチターゲット</h2>
+          <p>Appleのタッチターゲット最小サイズは<strong>44×44px</strong>だ。これはApple Human Interface Guidelinesの数値と一致する。</p>
+
+          <div class="touch-grid">
+            <div class="touch-card">
+              <div class="touch-card__target" style="width:44px; height:44px;">44</div>
+              <div style="text-align:center;">
+                <div style="font-size:13px; font-weight:600; color:var(--color-ink);">最小（44×44px）</div>
+                <div style="font-size:12px; color:var(--color-ink-muted-48);">アイコンボタン・チェックボックス</div>
+              </div>
+            </div>
+            <div class="touch-card">
+              <div class="touch-card__target" style="width:44px; height:44px; opacity:0.4;">24</div>
+              <div style="text-align:center;">
+                <div style="font-size:13px; font-weight:600; color:#e04040;">危険（24×24px）</div>
+                <div style="font-size:12px; color:var(--color-ink-muted-48);">視覚的には存在するが、タップできない</div>
+              </div>
+            </div>
+          </div>
+
+          <p>Global Nav の高さが44pxに設定されているのはタッチターゲットの最小値と一致するからだ。ナビ内のすべてのリンクは44×44pxのタッチ領域を確保している。</p>
+
+          <div class="callout">
+            <p class="callout__label">実装テクニック</p>
+            <p>視覚的なサイズが小さくてもタッチターゲットを大きくする方法: <span class="token-name">padding</span> で当たり判定を広げる。または <span class="token-name">::after</span> 擬似要素で透明な44×44pxの領域を追加する。</p>
+          </div>
+        </section>
+
+        <section id="nav-collapse" class="prose">
+          <h2>ナビゲーションの折り畳み</h2>
+          <p>Global Navのリンクは834px以下で折り畳まれてハンバーガーメニューになる。Sub Navはモバイルで異なる構造に変化する。</p>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0;">
+            <!-- Desktop Nav mock -->
+            <div style="border:1px solid var(--color-hairline); border-radius:var(--rounded-sm); overflow:hidden;">
+              <div style="background:#000; height:44px; padding:0 16px; display:flex; align-items:center; justify-content:space-between;">
+                <span style="font-size:14px; font-weight:600; color:#fff;">Apple Design</span>
+              </div>
+              <div style="padding:8px 12px; font-size:11px; color:var(--color-ink-muted-48); text-align:center;">デスクトップ（≥834px）</div>
+            </div>
+            <!-- Mobile Nav mock -->
+            <div style="border:1px solid var(--color-hairline); border-radius:var(--rounded-sm); overflow:hidden;">
+              <div style="background:#000; height:44px; padding:0 16px; display:flex; align-items:center; justify-content:space-between;">
+                <span style="font-size:14px; font-weight:600; color:#fff;">Apple的デザイン</span>
+                <div style="width:20px; height:20px; display:flex; flex-direction:column; justify-content:space-between; padding:3px 0;">
+                  <span style="display:block; height:2px; background:#fff; border-radius:1px;"></span>
+                  <span style="display:block; height:2px; background:#fff; border-radius:1px;"></span>
+                  <span style="display:block; height:2px; background:#fff; border-radius:1px;"></span>
+                </div>
+              </div>
+              <div style="padding:8px 12px; font-size:11px; color:var(--color-ink-muted-48); text-align:center;">モバイル（≤833px）</div>
+            </div>
+          </div>
+
+          <p>Sub Navは833px以下でリンクが非表示になり、製品名のみが表示される。CTAボタンは維持されることが多い。</p>
+
+          <div class="key-point">
+            <p class="key-point__quote">モバイルのナビはデスクトップのサブセットではない。<br>モバイル固有の優先順位でゼロから設計する。</p>
+            <p class="key-point__attr">ハンバーガーメニューは「隠す」ためではなく「整理する」ための構造だ。</p>
+          </div>
+        </section>
+
+        <section id="exercise">
+          <div class="exercise">
+            <span class="exercise__badge">演習</span>
+            <h2 class="exercise__title">ブレークポイント監査と再設計</h2>
+            <p class="exercise__desc">あなたの手元のプロジェクトまたはapple.comの任意のページを対象に、8つのブレークポイントで表示を確認し、モバイル版の再設計を行ってください。</p>
+            <ol class="exercise__steps">
+              <li>DevToolsのレスポンシブモードで、1440px / 1068px / 833px / 419px の4サイズで同じページをスクリーンショットする。</li>
+              <li>各サイズで「崩れている」か「意図通り変化している」かを分類する。崩れとは：テキストが重なる、要素がはみ出す、余白がゼロになる、タッチターゲットが44px未満になる。</li>
+              <li>最も問題のある1つのコンポーネントを選び、4つのブレークポイント全てで正しく機能するようCSSを修正する。</li>
+              <li>修正後のコードをFigmaのResponsive Frameで再現し、各ブレークポイントのバリアントを作成する。</li>
+              <li>「デスクトップ→モバイルで何が変わったか」を3点でまとめてコミュニティに投稿する。</li>
+            </ol>
+          </div>
+        </section>
+
+        <nav class="module-nav">
+          <a class="module-nav__btn" href="module-06.html">← Module 06</a>
+          <span class="module-nav__center">Module 07 / 12</span>
+          <a class="module-nav__btn" href="module-08.html">Module 08 →</a>
+        </nav>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 04 — スペーシングとグリッド | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-primary: #0066cc;
+      --color-primary-focus: #0071e3;
+      --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff;
+      --color-canvas-parchment: #f5f5f7;
+      --color-surface-tile-1: #272729;
+      --color-surface-black: #000000;
+      --color-ink: #1d1d1f;
+      --color-body-on-dark: #ffffff;
+      --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333;
+      --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0;
+      --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px;
+      --rounded-lg: 18px;
+      --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px;
+      color: var(--color-ink); background: var(--color-canvas);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .global-nav { position: sticky; top: 0; z-index: 100; height: 44px; background: var(--color-surface-black); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .global-nav__logo { font-size: 21px; font-weight: 600; color: #fff; letter-spacing: 0.231px; text-decoration: none; }
+    .global-nav__links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .global-nav__links a { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: -0.12px; text-decoration: none; }
+    .global-nav__links a:hover { color: #fff; }
+
+    .sub-nav { position: sticky; top: 44px; z-index: 99; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .sub-nav__breadcrumb { display: flex; align-items: center; gap: 6px; }
+    .sub-nav__breadcrumb a { font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .sub-nav__breadcrumb span { font-size: 14px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+    .sub-nav__progress { display: flex; align-items: center; gap: 12px; }
+    .progress-label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .progress-bar { width: 80px; height: 4px; background: var(--color-hairline); border-radius: var(--rounded-pill); overflow: hidden; }
+    .progress-bar__fill { height: 100%; width: 33.33%; background: var(--color-primary); border-radius: var(--rounded-pill); }
+
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 96px); max-width: 1280px; margin: 0 auto; }
+
+    .sidebar { position: sticky; top: 96px; height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--color-hairline); padding: 32px 0; background: var(--color-canvas); }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+    .sidebar__nav { list-style: none; margin-bottom: 32px; }
+    .sidebar__nav li a { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 14px; font-weight: 400; color: var(--color-ink-muted-48); letter-spacing: -0.224px; text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active { color: var(--color-primary); font-weight: 600; background: rgba(0,102,204,0.06); }
+    .sidebar__nav li a .nav-num { font-size: 11px; font-weight: 400; color: var(--color-ink-muted-48); min-width: 20px; }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-hairline); margin-left: auto; flex-shrink: 0; }
+    .sidebar__nav li a.done .nav-check { background: var(--color-primary); border-color: var(--color-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+
+    .article { padding: 64px 72px 120px; max-width: 760px; }
+    .article__eyebrow { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .article__title { font-size: 40px; font-weight: 600; line-height: 1.10; letter-spacing: 0; color: var(--color-ink); margin-bottom: 16px; }
+    .article__lead { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-ink-muted-48); margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--color-hairline); }
+
+    .prose h2 { font-size: 28px; font-weight: 600; line-height: 1.14; letter-spacing: 0.196px; color: var(--color-ink); margin: 56px 0 16px; }
+    .prose h3 { font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; color: var(--color-ink); margin: 40px 0 12px; }
+    .prose p { font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); margin-bottom: 20px; }
+    .prose strong { font-weight: 600; }
+
+    .callout { background: var(--color-canvas-parchment); border-left: 3px solid var(--color-primary); border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0; padding: 20px 24px; margin: 32px 0; }
+    .callout__label { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout p { font-size: 17px; font-weight: 400; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin: 0; }
+
+    .key-point { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; text-align: center; }
+    .key-point__quote { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-body-on-dark); margin-bottom: 16px; }
+    .key-point__attr { font-size: 14px; font-weight: 400; color: var(--color-body-muted); letter-spacing: -0.224px; }
+    /* .prose p (0-1-1) を上書き: 2クラス (0-2-0) で詳細度を上げる */
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .callout .callout__label     { color: var(--color-primary); }
+
+    .token-name { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); }
+
+    .exercise { background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; }
+    .exercise__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-primary); background: rgba(0,102,204,0.1); padding: 4px 12px; border-radius: var(--rounded-pill); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+    .exercise__title { font-size: 21px; font-weight: 600; color: var(--color-ink); letter-spacing: 0.231px; margin-bottom: 12px; }
+    .exercise__desc { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin-bottom: 20px; }
+    .exercise__steps { list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+    .exercise__steps li { display: flex; gap: 12px; font-size: 14px; color: var(--color-ink); line-height: 1.43; letter-spacing: -0.224px; counter-increment: step; }
+    .exercise__steps li::before { content: counter(step); width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0 0; border-top: 1px solid var(--color-hairline); margin-top: 80px; }
+    .module-nav__btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 400; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__center { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+
+    /* ── Spacing visualizer ─────────────────────── */
+    .spacing-palette {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--rounded-lg);
+      overflow: hidden;
+      margin: 24px 0;
+    }
+    .spacing-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--color-divider-soft);
+    }
+    .spacing-row:last-child { border-bottom: none; }
+    .spacing-bar-wrap { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .spacing-bar { height: 20px; background: rgba(0, 102, 204, 0.15); border-radius: 3px; border: 1px solid rgba(0,102,204,0.3); flex-shrink: 0; }
+    .spacing-token { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); min-width: 140px; }
+    .spacing-px { font-size: 13px; font-weight: 600; color: var(--color-ink); min-width: 32px; }
+    .spacing-use { font-size: 13px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+
+    /* ── Grid visualizer ────────────────────────── */
+    .grid-demo {
+      border-radius: var(--rounded-lg);
+      overflow: hidden;
+      margin: 24px 0;
+      background: var(--color-canvas-parchment);
+      padding: 24px;
+    }
+    .grid-demo__label {
+      font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .col-viz {
+      display: flex;
+      gap: 4px;
+    }
+    .col-viz__col {
+      flex: 1;
+      height: 48px;
+      background: rgba(0,102,204,0.12);
+      border-radius: 4px;
+      border: 1px solid rgba(0,102,204,0.2);
+    }
+    .col-viz__gutter { width: 20px; height: 48px; background: rgba(255,102,0,0.08); border-radius: 2px; flex-shrink: 0; }
+
+    /* ── Width rulers ───────────────────────────── */
+    .width-ruler {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .ruler-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ruler-bar {
+      height: 32px;
+      background: rgba(0,102,204,0.1);
+      border-radius: 4px;
+      border: 1px solid rgba(0,102,204,0.25);
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+    .ruler-bar__label { font-size: 12px; font-weight: 600; color: var(--color-primary); font-family: monospace; }
+    .ruler-meta { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+
+    /* ── Whitespace demo ────────────────────────── */
+    .whitespace-demo {
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--rounded-lg);
+      overflow: hidden;
+      margin: 32px 0;
+    }
+    .ws-tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    .ws-pad {
+      width: 100%;
+      background: rgba(0,102,204,0.06);
+      border-bottom: 1px dashed rgba(0,102,204,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 12px;
+    }
+    .ws-pad__label {
+      font-size: 11px;
+      font-family: monospace;
+      color: var(--color-primary);
+      opacity: 0.7;
+    }
+    .ws-content { padding: 0 40px; width: 100%; }
+
+    /* ── Breakpoint table ───────────────────────── */
+    .bp-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 13px; }
+    .bp-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .bp-table td { padding: 10px 12px; font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: top; }
+    .bp-table tr:last-child td { border-bottom: none; }
+    .bp-name { font-family: monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+
+    /* ── Collapse diagram ───────────────────────── */
+    .collapse-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin: 24px 0;
+    }
+    .collapse-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: var(--color-canvas-parchment);
+    }
+    .collapse-bp {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--color-primary);
+      min-width: 80px;
+      background: rgba(0,102,204,0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .collapse-grid {
+      display: flex;
+      gap: 3px;
+      flex: 1;
+    }
+    .collapse-col {
+      height: 24px;
+      background: rgba(0,102,204,0.15);
+      border-radius: 3px;
+      border: 1px solid rgba(0,102,204,0.2);
+      flex: 1;
+    }
+    .collapse-label {
+      font-size: 12px;
+      color: var(--color-ink-muted-48);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 833px) {
+      .page-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .article { padding: 40px 24px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a>
+      <span>›</span>
+      <span>Module 04</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">4 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 04</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro"       class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#base-unit"  ><span class="nav-num">2.</span> 8pxベースユニット<div class="nav-check"></div></a></li>
+        <li><a href="#tokens"     ><span class="nav-num">3.</span> スペーシングトークン<div class="nav-check"></div></a></li>
+        <li><a href="#container"  ><span class="nav-num">4.</span> コンテンツ幅とコンテナ<div class="nav-check"></div></a></li>
+        <li><a href="#columns"    ><span class="nav-num">5.</span> カラムパターン<div class="nav-check"></div></a></li>
+        <li><a href="#whitespace" ><span class="nav-num">6.</span> 余白の哲学<div class="nav-check"></div></a></li>
+        <li><a href="#responsive" ><span class="nav-num">7.</span> レスポンシブ設計<div class="nav-check"></div></a></li>
+        <li><a href="#exercise"   ><span class="nav-num">8.</span> 演習<div class="nav-check"></div></a></li>
+      </ul>
+      <p class="sidebar__section-label">モジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-01.html" class="done"><span class="nav-num">01.</span> デザイン哲学<div class="nav-check"></div></a></li>
+        <li><a href="module-02.html" class="done"><span class="nav-num">02.</span> カラーシステム<div class="nav-check"></div></a></li>
+        <li><a href="module-03.html" class="done"><span class="nav-num">03.</span> タイポグラフィ<div class="nav-check"></div></a></li>
+        <li><a href="module-04.html" class="active"><span class="nav-num">04.</span> スペーシング<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <article class="article">
+
+        <p class="article__eyebrow">Module 04 · スペーシング</p>
+        <h1 class="article__title">スペーシングとグリッド</h1>
+        <p class="article__lead">Appleのページは「余白が多すぎる」と思われがちだ。しかし80pxのセクションパディングはミスではない。それはプロダクトを台座に乗せるための、計算された沈黙だ。</p>
+
+        <!-- 1. はじめに -->
+        <section id="intro" class="prose">
+          <h2>このモジュールで学ぶこと</h2>
+          <p>スペーシングシステムは地味に見えるが、デザインの「音楽的なリズム」を決定づける。Appleのスペーシングには8pxのベースユニットがあり、そこから派生するトークンがすべてのコンポーネント間の距離を規定している。</p>
+          <p>グリッドも同様だ。最大コンテンツ幅が980pxになるのか1440pxになるのかは、「なんとなく」ではなく、ページの用途（テキスト重視か製品グリッド重視か）で決まる。このモジュールでは、その設計ロジックを体得する。</p>
+
+          <div class="callout">
+            <p class="callout__label">このモジュールの目標</p>
+            <p>Figmaでコンポーネントを配置するとき、「なぜここは24pxで、ここは80pxなのか」を即座に説明できるようになること。</p>
+          </div>
+        </section>
+
+        <!-- 2. 8pxベース -->
+        <section id="base-unit" class="prose">
+          <h2>8pxベースユニット</h2>
+          <p>Appleのスペーシングの基本単位は<strong>8px</strong>だ。構造的なレイアウト（コンポーネント間距離、セクション余白）はすべてこの8の倍数に収まる。</p>
+          <p>なぜ8pxか。デジタルディスプレイのほとんどは1x、2x、3xのピクセル密度を持ち、8は1・2・4のすべての倍数になる。つまり8pxは「どのデバイスでもピクセル完全」な最小単位だ。</p>
+
+          <div style="background:var(--color-canvas-parchment); border-radius:var(--rounded-lg); padding:24px; margin:24px 0;">
+            <div style="font-size:12px; font-weight:600; color:var(--color-ink-muted-48); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:16px;">8px グリッド上の許容値</div>
+            <div style="display:flex; align-items:flex-end; gap:8px; height:80px;">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="width:24px; background:rgba(0,102,204,0.2); border:1px solid rgba(0,102,204,0.3); height:4px; border-radius:2px;"></div>
+                <span style="font-size:10px; font-family:monospace; color:var(--color-ink-muted-48);">4</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="width:24px; background:rgba(0,102,204,0.3); border:1px solid rgba(0,102,204,0.4); height:8px; border-radius:2px;"></div>
+                <span style="font-size:10px; font-family:monospace; color:var(--color-ink-muted-48);">8</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="width:24px; background:rgba(0,102,204,0.35); border:1px solid rgba(0,102,204,0.4); height:12px; border-radius:2px;"></div>
+                <span style="font-size:10px; font-family:monospace; color:var(--color-ink-muted-48);">12</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="width:24px; background:rgba(0,102,204,0.4); border:1px solid rgba(0,102,204,0.5); height:17px; border-radius:2px; position:relative;">
+                  <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:9px;color:#cc6600;white-space:nowrap;">タイポ調整</div>
+                </div>
+                <span style="font-size:10px; font-family:monospace; color:#cc6600;">17</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="width:24px; background:rgba(0,102,204,0.45); border:1px solid rgba(0,102,204,0.5); height:20px; border-radius:2px;"></div>
+                <span style="font-size:10px; font-family:monospace; color:var(--color-ink-muted-48);">20</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="width:24px; background:rgba(0,102,204,0.5); border:1px solid rgba(0,102,204,0.6); height:24px; border-radius:2px;"></div>
+                <span style="font-size:10px; font-family:monospace; color:var(--color-ink-muted-48);">24</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="width:24px; background:rgba(0,102,204,0.55); border:1px solid rgba(0,102,204,0.65); height:32px; border-radius:2px;"></div>
+                <span style="font-size:10px; font-family:monospace; color:var(--color-ink-muted-48);">32</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="width:24px; background:rgba(0,102,204,0.6); border:1px solid rgba(0,102,204,0.7); height:48px; border-radius:2px;"></div>
+                <span style="font-size:10px; font-family:monospace; color:var(--color-ink-muted-48);">48</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="width:24px; background:rgba(0,102,204,0.7); border:1px solid rgba(0,102,204,0.8); height:64px; border-radius:2px;"></div>
+                <span style="font-size:10px; font-family:monospace; color:var(--color-ink-muted-48);">64</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="width:24px; background:rgba(0,102,204,0.8); border:1px solid rgba(0,102,204,0.9); height:80px; border-radius:2px;"></div>
+                <span style="font-size:10px; font-family:monospace; color:var(--color-ink-muted-48);">80</span>
+              </div>
+            </div>
+            <div style="margin-top:12px; font-size:12px; color:var(--color-ink-muted-48);">17px はタイポグラフィ調整用のサブ値。構造レイアウトでは使わない。</div>
+          </div>
+
+          <p>サブ値（2, 4, 5, 6, 7px）はタイポグラフィの微調整（行間・ベースラインオフセット）に使われるが、コンポーネント間の構造的な距離には使わない。構造スペーシングは8/12/16/20/24のいずれかにスナップする。</p>
+        </section>
+
+        <!-- 3. スペーシングトークン -->
+        <section id="tokens" class="prose">
+          <h2>スペーシングトークン全体像</h2>
+          <p>8つのスペーシングトークンが、apple.comのすべての余白を決定している。各トークンの用途は明確に分かれている。</p>
+
+          <div class="spacing-palette">
+            <div class="spacing-row">
+              <span class="spacing-token">{spacing.xxs}</span>
+              <span class="spacing-px">4px</span>
+              <div class="spacing-bar-wrap">
+                <div class="spacing-bar" style="width:4px;"></div>
+              </div>
+              <span class="spacing-use">アイコンの内側マージン・インライン要素間の最小間隔</span>
+            </div>
+            <div class="spacing-row">
+              <span class="spacing-token">{spacing.xs}</span>
+              <span class="spacing-px">8px</span>
+              <div class="spacing-bar-wrap">
+                <div class="spacing-bar" style="width:8px;"></div>
+              </div>
+              <span class="spacing-use">ベースユニット。ボタンの垂直パディング・インラインラベル間</span>
+            </div>
+            <div class="spacing-row">
+              <span class="spacing-token">{spacing.sm}</span>
+              <span class="spacing-px">12px</span>
+              <div class="spacing-bar-wrap">
+                <div class="spacing-bar" style="width:12px;"></div>
+              </div>
+              <span class="spacing-use">サブナビの内側余白・コンフィギュレーターチップの垂直パディング</span>
+            </div>
+            <div class="spacing-row">
+              <span class="spacing-token">{spacing.md}</span>
+              <span class="spacing-px">17px</span>
+              <div class="spacing-bar-wrap">
+                <div class="spacing-bar" style="width:17px;"></div>
+              </div>
+              <span class="spacing-use">ボディフォントサイズと揃える。段落間マージン・ナビリンク間隔</span>
+            </div>
+            <div class="spacing-row">
+              <span class="spacing-token">{spacing.lg}</span>
+              <span class="spacing-px">24px</span>
+              <div class="spacing-bar-wrap">
+                <div class="spacing-bar" style="width:24px;"></div>
+              </div>
+              <span class="spacing-use">ユーティリティカード内パディング・グリッドガター</span>
+            </div>
+            <div class="spacing-row">
+              <span class="spacing-token">{spacing.xl}</span>
+              <span class="spacing-px">32px</span>
+              <div class="spacing-bar-wrap">
+                <div class="spacing-bar" style="width:32px;"></div>
+              </div>
+              <span class="spacing-use">セクション内の中間マージン・ヘッドラインと本文の間</span>
+            </div>
+            <div class="spacing-row">
+              <span class="spacing-token">{spacing.xxl}</span>
+              <span class="spacing-px">48px</span>
+              <div class="spacing-bar-wrap">
+                <div class="spacing-bar" style="width:48px;"></div>
+              </div>
+              <span class="spacing-use">プロダクトビジュアルの上下最小クリアランス・モバイルタイルのパディング</span>
+            </div>
+            <div class="spacing-row" style="background:rgba(0,102,204,0.03);">
+              <span class="spacing-token" style="color:var(--color-primary); font-weight:600;">{spacing.section}</span>
+              <span class="spacing-px" style="color:var(--color-primary);">80px</span>
+              <div class="spacing-bar-wrap">
+                <div class="spacing-bar" style="width:80px; background:rgba(0,102,204,0.25); border-color:rgba(0,102,204,0.5);"></div>
+              </div>
+              <span class="spacing-use" style="color:var(--color-ink);">製品タイルの垂直パディング。これが「台座」を作る最重要値。</span>
+            </div>
+          </div>
+
+          <div class="callout">
+            <p class="callout__label">特に重要な値</p>
+            <p><span class="token-name">{spacing.section}</span> (80px) はapple.comを定義するスペーシング値だ。このひとつの数字を正しく使えているかどうかで、Apple的かどうかが決まる。</p>
+          </div>
+
+          <h3>ボタンのパディング</h3>
+          <p>ボタンはスペーシングトークンとは別に、固有のパディング値を持つ。</p>
+          <div style="border:1px solid var(--color-hairline); border-radius:var(--rounded-lg); overflow:hidden; margin:24px 0;">
+            <div style="padding:16px 20px; border-bottom:1px solid var(--color-divider-soft); display:flex; align-items:center; gap:16px;">
+              <span style="display:inline-flex;align-items:center;padding:11px 22px;border-radius:9999px;background:#0066cc;color:#fff;font-size:17px;font-weight:400;letter-spacing:-0.374px;">詳しく見る</span>
+              <span style="font-size:13px;color:var(--color-ink-muted-48);">11px × 22px （Primary Pill）</span>
+            </div>
+            <div style="padding:16px 20px; border-bottom:1px solid var(--color-divider-soft); display:flex; align-items:center; gap:16px;">
+              <span style="display:inline-flex;align-items:center;padding:8px 15px;border-radius:8px;background:#1d1d1f;color:#fff;font-size:14px;font-weight:400;letter-spacing:-0.224px;">Sign In</span>
+              <span style="font-size:13px;color:var(--color-ink-muted-48);">8px × 15px （Dark Utility）</span>
+            </div>
+            <div style="padding:16px 20px; display:flex; align-items:center; gap:16px;">
+              <span style="display:inline-flex;align-items:center;padding:14px 28px;border-radius:9999px;background:#0066cc;color:#fff;font-size:18px;font-weight:300;letter-spacing:0;">購入する</span>
+              <span style="font-size:13px;color:var(--color-ink-muted-48);">14px × 28px （Store Hero CTA）</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. コンテンツ幅 -->
+        <section id="container" class="prose">
+          <h2>コンテンツ幅とコンテナ</h2>
+          <p>apple.comには1つの最大幅があるのではなく、<strong>用途によって複数のコンテナ幅を使い分ける</strong>設計になっている。</p>
+
+          <div class="width-ruler">
+            <div class="ruler-row">
+              <div class="ruler-bar" style="width:100%;">
+                <span class="ruler-bar__label">Full-bleed (100vw)</span>
+              </div>
+              <span class="ruler-meta">製品タイルのヒーロー画像。viewport幅いっぱいに広がる。</span>
+            </div>
+            <div class="ruler-row">
+              <div class="ruler-bar" style="width:100%; background:rgba(0,102,204,0.15);">
+                <span class="ruler-bar__label">max-width: 1440px</span>
+              </div>
+              <span class="ruler-meta">ストア・アクセサリグリッド。製品グリッドの最大幅。</span>
+            </div>
+            <div class="ruler-row">
+              <div class="ruler-bar" style="width:68%; background:rgba(0,102,204,0.2);">
+                <span class="ruler-bar__label">max-width: 980px</span>
+              </div>
+              <span class="ruler-meta">テキスト重視のセクション（エンバイロメントページなど）。読みやすさを優先した幅。</span>
+            </div>
+          </div>
+
+          <div style="border:1px solid var(--color-hairline); border-radius:var(--rounded-lg); overflow:hidden; margin:24px 0;">
+            <div style="display:grid; grid-template-columns:120px 1fr 1fr; background:var(--color-canvas-parchment); border-bottom:1px solid var(--color-hairline); padding:8px 12px;">
+              <span style="font-size:12px;font-weight:600;color:var(--color-ink-muted-48);letter-spacing:0.3px;text-transform:uppercase;">幅</span>
+              <span style="font-size:12px;font-weight:600;color:var(--color-ink-muted-48);letter-spacing:0.3px;text-transform:uppercase;">用途</span>
+              <span style="font-size:12px;font-weight:600;color:var(--color-ink-muted-48);letter-spacing:0.3px;text-transform:uppercase;">特徴</span>
+            </div>
+            <div style="display:grid;grid-template-columns:120px 1fr 1fr;padding:10px 12px;border-bottom:1px solid var(--color-divider-soft);align-items:top;">
+              <span style="font-size:13px;font-weight:600;color:var(--color-ink);">Full-bleed</span>
+              <span style="font-size:13px;color:var(--color-ink-muted-48);">製品タイルヒーロー</span>
+              <span style="font-size:13px;color:var(--color-ink-muted-48);">画像が視野を占領</span>
+            </div>
+            <div style="display:grid;grid-template-columns:120px 1fr 1fr;padding:10px 12px;border-bottom:1px solid var(--color-divider-soft);align-items:top;">
+              <span style="font-size:13px;font-weight:600;color:var(--color-ink);">1440px</span>
+              <span style="font-size:13px;color:var(--color-ink-muted-48);">ストア・アクセサリグリッド</span>
+              <span style="font-size:13px;color:var(--color-ink-muted-48);">4〜5列カードグリッド</span>
+            </div>
+            <div style="display:grid;grid-template-columns:120px 1fr 1fr;padding:10px 12px;align-items:top;">
+              <span style="font-size:13px;font-weight:600;color:var(--color-ink);">980px</span>
+              <span style="font-size:13px;color:var(--color-ink-muted-48);">テキスト重視ページ</span>
+              <span style="font-size:13px;color:var(--color-ink-muted-48);">読書最適幅。1行あたり65〜75文字</span>
+            </div>
+          </div>
+
+          <p>980pxが「テキスト重視」に使われるのは、日本語・英語問わず「1行あたり適切な文字数（65〜75文字）」が読みやすいからだ。それ以上幅が広がると、視線移動が増えて読みにくくなる。</p>
+        </section>
+
+        <!-- 5. カラムパターン -->
+        <section id="columns" class="prose">
+          <h2>カラムパターン</h2>
+          <p>apple.comのコンテンツは大きく3つのレイアウトパターンを使い分ける。</p>
+
+          <div class="grid-demo">
+            <div class="grid-demo__label">① シングルカラム中央揃え（製品タイルヒーロー）</div>
+            <div class="col-viz">
+              <div class="col-viz__col" style="opacity:0.1;"></div>
+              <div class="col-viz__col" style="opacity:0.1;"></div>
+              <div class="col-viz__col" style="background:rgba(0,102,204,0.3); border-color:rgba(0,102,204,0.5);"></div>
+              <div class="col-viz__col" style="background:rgba(0,102,204,0.3); border-color:rgba(0,102,204,0.5);"></div>
+              <div class="col-viz__col" style="background:rgba(0,102,204,0.3); border-color:rgba(0,102,204,0.5);"></div>
+              <div class="col-viz__col" style="opacity:0.1;"></div>
+              <div class="col-viz__col" style="opacity:0.1;"></div>
+            </div>
+          </div>
+
+          <div class="grid-demo">
+            <div class="grid-demo__label">② 2カラム（ホームページ一部セクション）</div>
+            <div class="col-viz">
+              <div class="col-viz__col" style="background:rgba(0,102,204,0.25); border-color:rgba(0,102,204,0.4);"></div>
+              <div class="col-viz__col" style="background:rgba(0,102,204,0.25); border-color:rgba(0,102,204,0.4);"></div>
+              <div class="col-viz__gutter"></div>
+              <div class="col-viz__col" style="background:rgba(0,102,204,0.25); border-color:rgba(0,102,204,0.4);"></div>
+              <div class="col-viz__col" style="background:rgba(0,102,204,0.25); border-color:rgba(0,102,204,0.4);"></div>
+            </div>
+          </div>
+
+          <div class="grid-demo">
+            <div class="grid-demo__label">③ 4〜5カラムグリッド（ストア・アクセサリ）</div>
+            <div class="col-viz">
+              <div class="col-viz__col"></div>
+              <div class="col-viz__gutter"></div>
+              <div class="col-viz__col"></div>
+              <div class="col-viz__gutter"></div>
+              <div class="col-viz__col"></div>
+              <div class="col-viz__gutter"></div>
+              <div class="col-viz__col"></div>
+              <div class="col-viz__gutter"></div>
+              <div class="col-viz__col"></div>
+            </div>
+            <div style="margin-top:8px; font-size:12px; color:var(--color-ink-muted-48);">ガター幅: 20〜24px ({spacing.lg})</div>
+          </div>
+
+          <div class="callout">
+            <p class="callout__label">ガター幅のルール</p>
+            <p>グリッドカード間のガターは20〜24px（{spacing.lg}）に固定。それより狭くすると「詰め込んだ」印象になり、広くすると連続性が失われる。</p>
+          </div>
+        </section>
+
+        <!-- 6. 余白の哲学 -->
+        <section id="whitespace" class="prose">
+          <h2>余白の哲学：余白はペデスタル</h2>
+          <p>Appleの余白は「詰め忘れ」ではない。<strong>プロダクトを乗せる台座</strong>だ。美術館で彫刻が高い台座の上に置かれるのと同じ理由で、製品ビジュアルを大きな余白が囲む。</p>
+
+          <div class="whitespace-demo">
+            <div class="ws-tile">
+              <div class="ws-pad" style="height:80px;">
+                <span class="ws-pad__label">padding-top: 80px {spacing.section}</span>
+              </div>
+              <div class="ws-content" style="padding: 0 40px; text-align:center; padding-bottom:0; width:100%;">
+                <div style="font-size:28px; font-weight:600; letter-spacing:0; line-height:1.1; color:var(--color-ink); margin-bottom:12px;">MacBook Air</div>
+                <div style="font-size:17px; font-weight:400; letter-spacing:0.196px; color:var(--color-ink-muted-48); margin-bottom:20px;">薄い。軽い。ノートの常識を変える。</div>
+                <div style="display:flex; gap:12px; justify-content:center; margin-bottom:24px;">
+                  <span style="padding:8px 18px; border-radius:9999px; background:#0066cc; color:#fff; font-size:14px;">詳しく見る</span>
+                  <span style="padding:8px 18px; border-radius:9999px; background:transparent; color:#0066cc; border:1px solid #0066cc; font-size:14px;">購入する</span>
+                </div>
+                <div style="height:100px; background:#d1d1d6; border-radius:8px; box-shadow:rgba(0,0,0,0.22) 3px 5px 30px 0; margin:0 auto; max-width:200px;"></div>
+              </div>
+              <div class="ws-pad" style="height:80px; border-bottom:none; border-top:1px dashed rgba(0,102,204,0.25); margin-top:24px; align-items:flex-start;">
+                <span class="ws-pad__label">padding-bottom: 80px {spacing.section}</span>
+              </div>
+            </div>
+          </div>
+
+          <p>このデモでは、タイルの上下に80pxずつの「空気」がある。プロダクト（ここではモックアップ）の近くに別の要素が接近することはない。近接する要素との最小距離は40px以上を確保する。</p>
+
+          <div class="key-point">
+            <p class="key-point__quote">余白を削ると、<br>プロダクトの価値も削られる。</p>
+            <p class="key-point__attr">Appleのホワイトスペース哲学</p>
+          </div>
+
+          <h3>フッターだけが例外</h3>
+          <p>唯一の例外がフッターだ。フッターはAppleのサービス・サポート・法的情報のすべてを1画面に収める必要があるため、意図的に情報密度を高くしている。これはルール違反ではなく、「フッターは情報アーキテクチャを見せる場所」という別の役割に切り替えているからだ。</p>
+        </section>
+
+        <!-- 7. レスポンシブ -->
+        <section id="responsive" class="prose">
+          <h2>レスポンシブ設計 — 8段階のブレークポイント</h2>
+          <p>apple.comのレスポンシブ戦略は<strong>8段階のブレークポイント</strong>で定義されている。重要なのは全部を覚えることではなく、「どのブレークポイントで何が変わるか」のパターンを把握することだ。</p>
+
+          <table class="bp-table">
+            <thead>
+              <tr>
+                <th>名称</th>
+                <th>幅</th>
+                <th>主な変化</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="bp-name">small-phone</span></td>
+                <td>≤ 419px</td>
+                <td>1カラム固定。サブナビはカテゴリ名+CTA only。ヒーロー見出し28px。</td>
+              </tr>
+              <tr>
+                <td><span class="bp-name">phone</span></td>
+                <td>420–640px</td>
+                <td>1カラムスタック。製品ビジュアルはタイル幅の80%。h1 → 34px。</td>
+              </tr>
+              <tr>
+                <td><span class="bp-name">large-phone</span></td>
+                <td>641–735px</td>
+                <td>タイルのパディング 80px → 48px に縮小。</td>
+              </tr>
+              <tr>
+                <td><span class="bp-name">tablet-portrait</span></td>
+                <td>736–833px</td>
+                <td>グローバルナビ → ハンバーガー。サブナビのカテゴリチップ非表示。</td>
+              </tr>
+              <tr>
+                <td><span class="bp-name">tablet-landscape</span></td>
+                <td>834–1023px</td>
+                <td>グローバルナビ完全展開に戻る。3カラムグリッド → 2カラム。</td>
+              </tr>
+              <tr>
+                <td><span class="bp-name">small-desktop</span></td>
+                <td>1024–1068px</td>
+                <td>製品タイルが2/3幅+マージン。ヒーロー h1 は40pxを維持。</td>
+              </tr>
+              <tr>
+                <td><span class="bp-name">desktop</span></td>
+                <td>1069–1440px</td>
+                <td>フルレイアウト。4〜5カラムストアグリッド。コンテンツ幅1440px。</td>
+              </tr>
+              <tr>
+                <td><span class="bp-name">wide-desktop</span></td>
+                <td>≥ 1441px</td>
+                <td>コンテンツは1440pxでロック。残りはマージンが吸収。</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>エージェントが押さえるべき5つのブレークポイント</h3>
+          <p>8段階すべてを実装するのは現実的でないことも多い。最低限押さえるべき5点は：</p>
+          <div style="display:flex;flex-direction:column;gap:8px;margin:16px 0;">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--color-canvas-parchment);border-radius:8px;">
+              <span style="font-family:monospace;font-size:13px;color:var(--color-primary);font-weight:600;min-width:60px;">1440px</span>
+              <span style="font-size:14px;color:var(--color-ink);">コンテンツロック幅。これ以上広がらない上限。</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--color-canvas-parchment);border-radius:8px;">
+              <span style="font-family:monospace;font-size:13px;color:var(--color-primary);font-weight:600;min-width:60px;">1068px</span>
+              <span style="font-size:14px;color:var(--color-ink);">スモールデスクトップ切替。グリッド列数が変わる。</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--color-canvas-parchment);border-radius:8px;">
+              <span style="font-family:monospace;font-size:13px;color:var(--color-primary);font-weight:600;min-width:60px;">833px</span>
+              <span style="font-size:14px;color:var(--color-ink);">ナビがハンバーガーになる。モバイル体験の起点。</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--color-canvas-parchment);border-radius:8px;">
+              <span style="font-family:monospace;font-size:13px;color:var(--color-primary);font-weight:600;min-width:60px;">640px</span>
+              <span style="font-size:14px;color:var(--color-ink);">フォンサイズ切替。グリッドが完全1カラムに。</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--color-canvas-parchment);border-radius:8px;">
+              <span style="font-family:monospace;font-size:13px;color:var(--color-primary);font-weight:600;min-width:60px;">419px</span>
+              <span style="font-size:14px;color:var(--color-ink);">スモールフォン。見出しが最小28pxに。</span>
+            </div>
+          </div>
+
+          <h3>グリッドのコラプシング</h3>
+          <p>ユーティリティカードグリッドがレスポンシブでどう変化するかのパターン：</p>
+
+          <div class="collapse-diagram">
+            <div class="collapse-row">
+              <span class="collapse-bp">1440px+</span>
+              <div class="collapse-grid">
+                <div class="collapse-col"></div>
+                <div class="collapse-col"></div>
+                <div class="collapse-col"></div>
+                <div class="collapse-col"></div>
+                <div class="collapse-col"></div>
+              </div>
+              <span class="collapse-label">5カラム</span>
+            </div>
+            <div class="collapse-row">
+              <span class="collapse-bp">1068px</span>
+              <div class="collapse-grid">
+                <div class="collapse-col"></div>
+                <div class="collapse-col"></div>
+                <div class="collapse-col"></div>
+                <div class="collapse-col"></div>
+              </div>
+              <span class="collapse-label">4カラム</span>
+            </div>
+            <div class="collapse-row">
+              <span class="collapse-bp">834px</span>
+              <div class="collapse-grid">
+                <div class="collapse-col"></div>
+                <div class="collapse-col"></div>
+                <div class="collapse-col"></div>
+              </div>
+              <span class="collapse-label">3カラム</span>
+            </div>
+            <div class="collapse-row">
+              <span class="collapse-bp">640px</span>
+              <div class="collapse-grid">
+                <div class="collapse-col"></div>
+                <div class="collapse-col"></div>
+              </div>
+              <span class="collapse-label">2カラム</span>
+            </div>
+            <div class="collapse-row">
+              <span class="collapse-bp">≤ 640px</span>
+              <div class="collapse-grid">
+                <div class="collapse-col"></div>
+              </div>
+              <span class="collapse-label">1カラム</span>
+            </div>
+          </div>
+
+          <h3>タッチターゲットの最小サイズ</h3>
+          <p>すべてのインタラクティブ要素は<strong>最小44×44px</strong>のタッチターゲットを確保する。Primary Pill CTA は視覚的にはコンパクトに見えるが、全ピル型の効果でヒットエリアが広く、タップしやすい。</p>
+        </section>
+
+        <!-- 演習 -->
+        <section id="exercise">
+          <div class="exercise">
+            <span class="exercise__badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              演習
+            </span>
+            <h2 class="exercise__title">製品タイルのレイアウトをグリッドから組む</h2>
+            <p class="exercise__desc">これまで3つのモジュール（カラー・タイポグラフィ・スペーシング）で学んだ内容を統合して、Figmaで完全な製品タイル1枚を構築します。すべてのトークンを正しく使い、モバイルバージョンも並べて作ることが目標です。</p>
+            <ol class="exercise__steps">
+              <li>デスクトップフレーム (1440px幅) を作成し、コンテンツを中央980px内にレイアウト。タイルに <span class="token-name">{spacing.section}</span> (80px) の垂直パディングを設定。</li>
+              <li>製品名 ({typography.display-lg} = 40px/600)、タグライン ({typography.lead} = 28px/400)、2つのCTA、製品モックアップを配置。CTAはCenter aligned。</li>
+              <li>ライトバージョン (background: #ffffff) とダークバージョン (background: #272729) の2種を作り、それぞれのテキストカラーとリンクカラーを正しく切り替える。</li>
+              <li>モバイルフレーム (390px) を隣に作成。パディングを80px → 48px に縮小し、見出しを40px → 28px に縮小。製品ビジュアルをタイル幅の80%にスケール。</li>
+              <li>完成したフレームをコミュニティのFigmaチームファイルに貼り付け、どのトークンを使ったかをコメントで説明する。</li>
+            </ol>
+          </div>
+        </section>
+
+        <nav class="module-nav">
+          <a class="module-nav__btn" href="module-03.html">← Module 03</a>
+          <span class="module-nav__center">Module 04 / 12</span>
+          <a class="module-nav__btn" href="module-05.html">Module 05 →</a>
+        </nav>
+
+      </article>
+    </main>
+  </div>
+
+</body>
+</html>

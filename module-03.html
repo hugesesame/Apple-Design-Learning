@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 03 — タイポグラフィ体系 | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-primary: #0066cc;
+      --color-primary-focus: #0071e3;
+      --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff;
+      --color-canvas-parchment: #f5f5f7;
+      --color-surface-tile-1: #272729;
+      --color-surface-black: #000000;
+      --color-ink: #1d1d1f;
+      --color-body-on-dark: #ffffff;
+      --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333;
+      --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0;
+      --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px;
+      --rounded-lg: 18px;
+      --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px;
+      color: var(--color-ink); background: var(--color-canvas);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .global-nav { position: sticky; top: 0; z-index: 100; height: 44px; background: var(--color-surface-black); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .global-nav__logo { font-size: 21px; font-weight: 600; color: #fff; letter-spacing: 0.231px; text-decoration: none; }
+    .global-nav__links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .global-nav__links a { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: -0.12px; text-decoration: none; }
+    .global-nav__links a:hover { color: #fff; }
+
+    .sub-nav { position: sticky; top: 44px; z-index: 99; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .sub-nav__breadcrumb { display: flex; align-items: center; gap: 6px; }
+    .sub-nav__breadcrumb a { font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .sub-nav__breadcrumb span { font-size: 14px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+    .sub-nav__progress { display: flex; align-items: center; gap: 12px; }
+    .progress-label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .progress-bar { width: 80px; height: 4px; background: var(--color-hairline); border-radius: var(--rounded-pill); overflow: hidden; }
+    .progress-bar__fill { height: 100%; width: 25%; background: var(--color-primary); border-radius: var(--rounded-pill); }
+
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 96px); max-width: 1280px; margin: 0 auto; }
+
+    .sidebar { position: sticky; top: 96px; height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--color-hairline); padding: 32px 0; background: var(--color-canvas); }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+    .sidebar__nav { list-style: none; margin-bottom: 32px; }
+    .sidebar__nav li a { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 14px; font-weight: 400; color: var(--color-ink-muted-48); letter-spacing: -0.224px; text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active { color: var(--color-primary); font-weight: 600; background: rgba(0,102,204,0.06); }
+    .sidebar__nav li a .nav-num { font-size: 11px; font-weight: 400; color: var(--color-ink-muted-48); min-width: 20px; }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-hairline); margin-left: auto; flex-shrink: 0; }
+    .sidebar__nav li a.done .nav-check { background: var(--color-primary); border-color: var(--color-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+
+    .article { padding: 64px 72px 120px; max-width: 760px; }
+    .article__eyebrow { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .article__title { font-size: 40px; font-weight: 600; line-height: 1.10; letter-spacing: 0; color: var(--color-ink); margin-bottom: 16px; }
+    .article__lead { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-ink-muted-48); margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--color-hairline); }
+
+    .prose h2 { font-size: 28px; font-weight: 600; line-height: 1.14; letter-spacing: 0.196px; color: var(--color-ink); margin: 56px 0 16px; }
+    .prose h3 { font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; color: var(--color-ink); margin: 40px 0 12px; }
+    .prose p { font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); margin-bottom: 20px; }
+    .prose strong { font-weight: 600; }
+
+    .callout { background: var(--color-canvas-parchment); border-left: 3px solid var(--color-primary); border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0; padding: 20px 24px; margin: 32px 0; }
+    .callout__label { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout p { font-size: 17px; font-weight: 400; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin: 0; }
+
+    .key-point { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; text-align: center; }
+    .key-point__quote { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-body-on-dark); margin-bottom: 16px; }
+    .key-point__attr { font-size: 14px; font-weight: 400; color: var(--color-body-muted); letter-spacing: -0.224px; }
+    /* .prose p (0-1-1) を上書き: 2クラス (0-2-0) で詳細度を上げる */
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .callout .callout__label     { color: var(--color-primary); }
+
+    .token-name { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); }
+
+    .exercise { background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; }
+    .exercise__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-primary); background: rgba(0,102,204,0.1); padding: 4px 12px; border-radius: var(--rounded-pill); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+    .exercise__title { font-size: 21px; font-weight: 600; color: var(--color-ink); letter-spacing: 0.231px; margin-bottom: 12px; }
+    .exercise__desc { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin-bottom: 20px; }
+    .exercise__steps { list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+    .exercise__steps li { display: flex; gap: 12px; font-size: 14px; color: var(--color-ink); line-height: 1.43; letter-spacing: -0.224px; counter-increment: step; }
+    .exercise__steps li::before { content: counter(step); width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0 0; border-top: 1px solid var(--color-hairline); margin-top: 80px; }
+    .module-nav__btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 400; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__center { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+
+    /* ── Type Scale Table ───────────────────────── */
+    .type-scale-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .type-scale-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .type-scale-table td { padding: 14px 12px; font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: middle; }
+    .type-scale-table tr:last-child td { border-bottom: none; }
+    .type-scale-table tr:hover td { background: var(--color-canvas-parchment); }
+    .type-scale-table .sample { color: var(--color-ink); vertical-align: middle; }
+    .type-scale-table .mono { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; background: var(--color-canvas-parchment); padding: 2px 5px; border-radius: 4px; white-space: nowrap; }
+
+    /* ── Live type demo ─────────────────────────── */
+    .type-demo {
+      background: var(--color-canvas-parchment);
+      border-radius: var(--rounded-lg);
+      padding: 40px;
+      margin: 32px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .type-demo--dark {
+      background: var(--color-surface-tile-1);
+    }
+    .type-demo__label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--color-ink-muted-48);
+      margin-bottom: -16px;
+    }
+    .type-demo--dark .type-demo__label { color: rgba(255,255,255,0.3); }
+
+    /* ── Weight ladder ──────────────────────────── */
+    .weight-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 32px;
+      background: var(--color-canvas-parchment);
+      border-radius: var(--rounded-lg);
+      margin: 24px 0;
+    }
+    .weight-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+    .weight-label {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--color-ink-muted-48);
+      letter-spacing: 0.3px;
+      width: 80px;
+      flex-shrink: 0;
+      font-family: monospace;
+    }
+    .weight-sample {
+      font-size: 24px;
+      line-height: 1.2;
+      color: var(--color-ink);
+      letter-spacing: -0.28px;
+    }
+    .weight-row--absent .weight-label { color: #cc0000; opacity: 0.6; }
+    .weight-row--absent .weight-sample { color: #cc0000; opacity: 0.4; text-decoration: line-through; }
+
+    /* ── Tracking demo ──────────────────────────── */
+    .tracking-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--color-hairline);
+      border-radius: var(--rounded-lg);
+      overflow: hidden;
+      margin: 24px 0;
+    }
+    .tracking-panel {
+      background: var(--color-canvas-parchment);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tracking-panel__label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-ink-muted-48);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* ── Line-height demo ───────────────────────── */
+    .lh-demo {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .lh-card {
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--rounded-lg);
+      padding: 20px;
+      background: var(--color-canvas);
+    }
+    .lh-card__label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-primary);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .lh-card__meta {
+      font-size: 12px;
+      font-family: monospace;
+      color: var(--color-ink-muted-48);
+      margin-top: 8px;
+    }
+
+    /* ── Before/after ───────────────────────────── */
+    .before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 32px 0; }
+    .ba-card { border-radius: var(--rounded-lg); overflow: hidden; border: 1px solid var(--color-hairline); }
+    .ba-card__header { padding: 10px 16px; font-size: 12px; font-weight: 600; letter-spacing: 0.3px; }
+    .ba-card__header--before { background: #fff3f3; color: #cc0000; }
+    .ba-card__header--after  { background: #f0f8ff; color: var(--color-primary); }
+    .ba-card__content { padding: 24px; min-height: 140px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 12px; }
+
+    @media (max-width: 833px) {
+      .page-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .article { padding: 40px 24px 80px; }
+      .before-after { grid-template-columns: 1fr; }
+      .tracking-compare { grid-template-columns: 1fr; }
+      .lh-demo { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a>
+      <span>›</span>
+      <span>Module 03</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">3 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 03</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro"      class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#family"    ><span class="nav-num">2.</span> フォントファミリー<div class="nav-check"></div></a></li>
+        <li><a href="#scale"     ><span class="nav-num">3.</span> タイプスケール全体像<div class="nav-check"></div></a></li>
+        <li><a href="#tracking"  ><span class="nav-num">4.</span> ネガティブトラッキング<div class="nav-check"></div></a></li>
+        <li><a href="#weight"    ><span class="nav-num">5.</span> ウェイト体系<div class="nav-check"></div></a></li>
+        <li><a href="#lineh"     ><span class="nav-num">6.</span> ラインハイトの設計<div class="nav-check"></div></a></li>
+        <li><a href="#17px"      ><span class="nav-num">7.</span> なぜ17pxなのか<div class="nav-check"></div></a></li>
+        <li><a href="#exercise"  ><span class="nav-num">8.</span> 演習<div class="nav-check"></div></a></li>
+      </ul>
+      <p class="sidebar__section-label">モジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-01.html" class="done"><span class="nav-num">01.</span> デザイン哲学<div class="nav-check"></div></a></li>
+        <li><a href="module-02.html" class="done"><span class="nav-num">02.</span> カラーシステム<div class="nav-check"></div></a></li>
+        <li><a href="module-03.html" class="active"><span class="nav-num">03.</span> タイポグラフィ<div class="nav-check"></div></a></li>
+        <li><a href="module-04.html"><span class="nav-num">04.</span> スペーシング<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <article class="article">
+
+        <p class="article__eyebrow">Module 03 · タイポグラフィ</p>
+        <h1 class="article__title">タイポグラフィ体系</h1>
+        <p class="article__lead">Appleのタイポグラフィは「静かに語る」。56pxのヒーロー見出しから10pxのマイクロリーガルまで、すべてのサイズに理由があり、すべてのウェイトに役割がある。</p>
+
+        <!-- 1. はじめに -->
+        <section id="intro" class="prose">
+          <h2>このモジュールで学ぶこと</h2>
+          <p>フォントサイズを選ぶとき、多くの設計者は「見た目で判断する」。しかしAppleのタイポグラフィには判断のフレームワークがある。表示サイズにはネガティブトラッキング、ボディには17px、ウェイトは300/400/600/700のみ。これらのルールが組み合わさって、「Apple Tight」と呼ばれる独特のヘッドライン感が生まれる。</p>
+
+          <div class="callout">
+            <p class="callout__label">このモジュールの目標</p>
+            <p>タイプスケールのすべてのトークンを暗記するより、「なぜAppleはこのサイズとウェイトを選んだのか」を文章で説明できるようになること。</p>
+          </div>
+        </section>
+
+        <!-- 2. フォントファミリー -->
+        <section id="family" class="prose">
+          <h2>フォントファミリー</h2>
+          <p>AppleはすべてのWebプロパティにプロプライエタリフォント <strong>SF Pro</strong> を使用している。SF Pro Display（19px以上向け）とSF Pro Text（それ以下向け）の2バリアントがあり、用途で使い分ける。</p>
+
+          <div style="border: 1px solid var(--color-hairline); border-radius: var(--rounded-lg); overflow: hidden; margin: 24px 0;">
+            <div style="padding:20px 24px; border-bottom:1px solid var(--color-hairline); background:var(--color-canvas-parchment);">
+              <div style="font-size:12px; font-weight:600; color:var(--color-ink-muted-48); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:8px;">SF Pro Display</div>
+              <div style="font-size:40px; font-weight:600; line-height:1.1; letter-spacing:-0.28px; color:var(--color-ink);">Beautiful design.</div>
+              <div style="font-size:13px; color:var(--color-ink-muted-48); margin-top:8px; font-family:monospace;">表示サイズ (19px+) · weight 600 · tracking -0.28px</div>
+            </div>
+            <div style="padding:20px 24px;">
+              <div style="font-size:12px; font-weight:600; color:var(--color-ink-muted-48); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:8px;">SF Pro Text</div>
+              <div style="font-size:17px; font-weight:400; line-height:1.47; letter-spacing:-0.374px; color:var(--color-ink);">Appleは製品のデザインと同じ真剣さでタイポグラフィに向き合う。17pxのボディテキストは、「読む」ための設計だ。</div>
+              <div style="font-size:13px; color:var(--color-ink-muted-48); margin-top:8px; font-family:monospace;">本文サイズ (17px) · weight 400 · tracking -0.374px · lh 1.47</div>
+            </div>
+          </div>
+
+          <h3>代替フォント：Inter</h3>
+          <p>SF Pro はAppleのシステムフォントであり、非Apple環境では自動的に代替フォントに落ちる。オープンソース代替として <strong>Inter</strong>（Google Fonts）が最も近い選択肢だ。</p>
+
+          <div style="background:var(--color-canvas-parchment); border-radius:var(--rounded-lg); padding:24px; margin:24px 0;">
+            <div style="font-size:12px; font-weight:600; color:var(--color-ink-muted-48); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:16px;">Interで近似するための調整</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; gap:12px; align-items:flex-start;">
+                <div style="width:6px; height:6px; border-radius:50%; background:var(--color-primary); margin-top:6px; flex-shrink:0;"></div>
+                <p style="font-size:14px; color:var(--color-ink); line-height:1.43; letter-spacing:-0.224px; margin:0;">CSS スタック: <span class="token-name">Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif</span> — macOS/iOS/Safariでは実際のSF Proに解決される</p>
+              </div>
+              <div style="display:flex; gap:12px; align-items:flex-start;">
+                <div style="width:6px; height:6px; border-radius:50%; background:var(--color-primary); margin-top:6px; flex-shrink:0;"></div>
+                <p style="font-size:14px; color:var(--color-ink); line-height:1.43; letter-spacing:-0.224px; margin:0;">表示サイズのletter-spacing: <span class="token-name">-0.01em</span> を追加 — InterのデフォルトトラッキングはSF Proより広いため</p>
+              </div>
+              <div style="display:flex; gap:12px; align-items:flex-start;">
+                <div style="width:6px; height:6px; border-radius:50%; background:var(--color-primary); margin-top:6px; flex-shrink:0;"></div>
+                <p style="font-size:14px; color:var(--color-ink); line-height:1.43; letter-spacing:-0.224px; margin:0;">ボディのline-height: <span class="token-name">1.47 → 1.44</span> に微調整 — InterはSF Proよりx-heightが高いため、行間を少し詰める</p>
+              </div>
+              <div style="display:flex; gap:12px; align-items:flex-start;">
+                <div style="width:6px; height:6px; border-radius:50%; background:var(--color-primary); margin-top:6px; flex-shrink:0;"></div>
+                <p style="font-size:14px; color:var(--color-ink); line-height:1.43; letter-spacing:-0.224px; margin:0;">weight 600 + <span class="token-name">font-feature-settings: "ss03"</span> で、SF Proの丸みを帯びた「a」文字を近似</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. タイプスケール -->
+        <section id="scale" class="prose">
+          <h2>タイプスケール全体像</h2>
+          <p>Appleのタイプスケールは14段階ある。以下は各トークンのサイズ・ウェイト・ラインハイト・レタースペーシングとライブプレビューの一覧だ。</p>
+
+          <div style="overflow-x:auto;">
+            <table class="type-scale-table">
+              <thead>
+                <tr>
+                  <th>トークン</th>
+                  <th>サンプル</th>
+                  <th>Size / Weight</th>
+                  <th>LH / LS</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="mono">{typography.hero-display}</span></td>
+                  <td class="sample"><span style="font-size:36px;font-weight:600;line-height:1.07;letter-spacing:-0.28px;display:block;">Hero</span></td>
+                  <td>56px / 600</td>
+                  <td>1.07 / -0.28px</td>
+                  <td>ヒーロー見出し</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.display-lg}</span></td>
+                  <td class="sample"><span style="font-size:28px;font-weight:600;line-height:1.10;letter-spacing:0;display:block;">Headline</span></td>
+                  <td>40px / 600</td>
+                  <td>1.10 / 0</td>
+                  <td>製品タイル見出し</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.display-md}</span></td>
+                  <td class="sample"><span style="font-size:24px;font-weight:600;line-height:1.47;letter-spacing:-0.374px;display:block;">Section</span></td>
+                  <td>34px / 600</td>
+                  <td>1.47 / -0.374px</td>
+                  <td>セクション見出し</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.lead}</span></td>
+                  <td class="sample"><span style="font-size:21px;font-weight:400;line-height:1.14;letter-spacing:0.196px;display:block;">Tagline copy</span></td>
+                  <td>28px / 400</td>
+                  <td>1.14 / +0.196px</td>
+                  <td>タイルサブコピー</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.lead-airy}</span></td>
+                  <td class="sample"><span style="font-size:18px;font-weight:300;line-height:1.5;letter-spacing:0;display:block;">Airy lead text</span></td>
+                  <td>24px / <strong>300</strong></td>
+                  <td>1.5 / 0</td>
+                  <td>エンバイロメントリード段落</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.tagline}</span></td>
+                  <td class="sample"><span style="font-size:16px;font-weight:600;line-height:1.19;letter-spacing:0.231px;display:block;">Sub-tile tagline</span></td>
+                  <td>21px / 600</td>
+                  <td>1.19 / +0.231px</td>
+                  <td>サブタイルタグライン・サブナビ</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.body-strong}</span></td>
+                  <td class="sample"><span style="font-size:17px;font-weight:600;line-height:1.24;letter-spacing:-0.374px;display:block;">Strong body</span></td>
+                  <td>17px / 600</td>
+                  <td>1.24 / -0.374px</td>
+                  <td>インライン強調</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.body}</span></td>
+                  <td class="sample"><span style="font-size:17px;font-weight:400;line-height:1.47;letter-spacing:-0.374px;display:block;">Default body paragraph</span></td>
+                  <td>17px / 400</td>
+                  <td>1.47 / -0.374px</td>
+                  <td>デフォルト段落</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.dense-link}</span></td>
+                  <td class="sample"><span style="font-size:17px;font-weight:400;line-height:2.41;letter-spacing:0;display:block;">Footer link</span></td>
+                  <td>17px / 400</td>
+                  <td><strong>2.41</strong> / 0</td>
+                  <td>フッター・ストアリンクリスト</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.caption}</span></td>
+                  <td class="sample"><span style="font-size:14px;font-weight:400;line-height:1.43;letter-spacing:-0.224px;display:block;">Caption text</span></td>
+                  <td>14px / 400</td>
+                  <td>1.43 / -0.224px</td>
+                  <td>キャプション・ボタンラベル</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.button-large}</span></td>
+                  <td class="sample"><span style="font-size:16px;font-weight:300;line-height:1.0;letter-spacing:0;display:block;">Store CTA</span></td>
+                  <td>18px / <strong>300</strong></td>
+                  <td>1.0 / 0</td>
+                  <td>ストアヒーローCTA（レア）</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.button-utility}</span></td>
+                  <td class="sample"><span style="font-size:14px;font-weight:400;line-height:1.29;letter-spacing:-0.224px;display:block;">Utility button</span></td>
+                  <td>14px / 400</td>
+                  <td>1.29 / -0.224px</td>
+                  <td>ユーティリティ/ナビボタン</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.nav-link}</span></td>
+                  <td class="sample"><span style="font-size:12px;font-weight:400;line-height:1.0;letter-spacing:-0.12px;display:block;">Nav link</span></td>
+                  <td>12px / 400</td>
+                  <td>1.0 / -0.12px</td>
+                  <td>グローバルナビのメニュー項目</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.fine-print}</span></td>
+                  <td class="sample"><span style="font-size:12px;font-weight:400;line-height:1.0;letter-spacing:-0.12px;color:var(--color-ink-muted-48);display:block;">Fine print text</span></td>
+                  <td>12px / 400</td>
+                  <td>1.0 / -0.12px</td>
+                  <td>ファインプリント・フッター本文</td>
+                </tr>
+                <tr>
+                  <td><span class="mono">{typography.micro-legal}</span></td>
+                  <td class="sample"><span style="font-size:10px;font-weight:400;line-height:1.3;letter-spacing:-0.08px;color:var(--color-ink-muted-48);display:block;">Micro legal disclaimer</span></td>
+                  <td>10px / 400</td>
+                  <td>1.3 / -0.08px</td>
+                  <td>マイクロ免責事項</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 4. ネガティブトラッキング -->
+        <section id="tracking" class="prose">
+          <h2>ネガティブトラッキング — Apple Tightの秘密</h2>
+          <p>Appleのヘッドラインが「締まって見える」最大の理由は、<strong>ネガティブレタースペーシング</strong>だ。17px以上のすべてのテキストに、-0.12px から -0.374px のマイナストラッキングが適用されている。</p>
+
+          <div class="tracking-compare">
+            <div class="tracking-panel">
+              <span class="tracking-panel__label">✕ トラッキング 0（デフォルト）</span>
+              <div style="font-size:32px; font-weight:600; line-height:1.1; letter-spacing:0; color:var(--color-ink);">Designed by Apple</div>
+              <div style="font-size:12px; font-family:monospace; color:var(--color-ink-muted-48); margin-top:8px;">letter-spacing: 0</div>
+            </div>
+            <div class="tracking-panel">
+              <span class="tracking-panel__label" style="color:var(--color-primary);">✓ ネガティブトラッキング</span>
+              <div style="font-size:32px; font-weight:600; line-height:1.1; letter-spacing:-0.374px; color:var(--color-ink);">Designed by Apple</div>
+              <div style="font-size:12px; font-family:monospace; color:var(--color-ink-muted-48); margin-top:8px;">letter-spacing: -0.374px</div>
+            </div>
+          </div>
+
+          <p>差は微妙に見えるが、長い見出しや複数行にわたるヒーロー見出しでは、印象が大きく変わる。Interを使う場合は、SF ProよりトラッキングがデフォルトでやYや広いため、さらに -0.01em を追加する。</p>
+
+          <div class="callout">
+            <p class="callout__label">ルール</p>
+            <p>ネガティブレタースペーシングは17px以上に限る。12px以下でネガティブトラッキングを適用すると可読性が著しく低下するため、小サイズには適用しない。これはAppleが実際に守っているルールだ。</p>
+          </div>
+
+          <h3>サイズ別トラッキング値</h3>
+          <div style="border:1px solid var(--color-hairline); border-radius:var(--rounded-lg); overflow:hidden; margin:24px 0;">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; background:var(--color-canvas-parchment); border-bottom:1px solid var(--color-hairline); padding:8px 12px;">
+              <span style="font-size:12px;font-weight:600;color:var(--color-ink-muted-48);letter-spacing:0.3px;text-transform:uppercase;">サイズ</span>
+              <span style="font-size:12px;font-weight:600;color:var(--color-ink-muted-48);letter-spacing:0.3px;text-transform:uppercase;">Letter-spacing</span>
+              <span style="font-size:12px;font-weight:600;color:var(--color-ink-muted-48);letter-spacing:0.3px;text-transform:uppercase;">プレビュー</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 12px;border-bottom:1px solid var(--color-divider-soft);align-items:center;">
+              <span style="font-size:13px;color:var(--color-ink);">56px (hero)</span>
+              <span style="font-family:monospace;font-size:12px;color:var(--color-primary);">-0.28px</span>
+              <span style="font-size:20px;font-weight:600;letter-spacing:-0.28px;color:var(--color-ink);">Apple</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 12px;border-bottom:1px solid var(--color-divider-soft);align-items:center;">
+              <span style="font-size:13px;color:var(--color-ink);">34px (display-md)</span>
+              <span style="font-family:monospace;font-size:12px;color:var(--color-primary);">-0.374px</span>
+              <span style="font-size:18px;font-weight:600;letter-spacing:-0.374px;color:var(--color-ink);">Apple</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 12px;border-bottom:1px solid var(--color-divider-soft);align-items:center;">
+              <span style="font-size:13px;color:var(--color-ink);">17px (body)</span>
+              <span style="font-family:monospace;font-size:12px;color:var(--color-primary);">-0.374px</span>
+              <span style="font-size:17px;font-weight:400;letter-spacing:-0.374px;color:var(--color-ink);">Apple</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 12px;border-bottom:1px solid var(--color-divider-soft);align-items:center;">
+              <span style="font-size:13px;color:var(--color-ink);">14px (caption)</span>
+              <span style="font-family:monospace;font-size:12px;color:var(--color-primary);">-0.224px</span>
+              <span style="font-size:14px;font-weight:400;letter-spacing:-0.224px;color:var(--color-ink);">Apple</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 12px;border-bottom:1px solid var(--color-divider-soft);align-items:center;">
+              <span style="font-size:13px;color:var(--color-ink);">12px (nav)</span>
+              <span style="font-family:monospace;font-size:12px;color:var(--color-primary);">-0.12px</span>
+              <span style="font-size:12px;font-weight:400;letter-spacing:-0.12px;color:var(--color-ink);">Apple</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 12px;align-items:center;background:rgba(0,0,0,0.01);">
+              <span style="font-size:13px;color:var(--color-ink-muted-48);">10px (micro)</span>
+              <span style="font-family:monospace;font-size:12px;color:var(--color-ink-muted-48);">-0.08px</span>
+              <span style="font-size:10px;font-weight:400;letter-spacing:-0.08px;color:var(--color-ink-muted-48);">Apple</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. ウェイト体系 -->
+        <section id="weight" class="prose">
+          <h2>ウェイト体系 — 500が存在しない理由</h2>
+          <p>Appleのフォントウェイトは <strong>300 / 400 / 600 / 700</strong> の4段階だ。多くの設計者が使う500（Medium）は意図的に省かれている。</p>
+
+          <div class="weight-demo">
+            <div class="weight-row">
+              <span class="weight-label">300 · Light</span>
+              <span class="weight-sample" style="font-weight:300;">Beautiful design.</span>
+            </div>
+            <div class="weight-row">
+              <span class="weight-label">400 · Regular</span>
+              <span class="weight-sample" style="font-weight:400;">Beautiful design.</span>
+            </div>
+            <div class="weight-row weight-row--absent">
+              <span class="weight-label">500 · Medium</span>
+              <span class="weight-sample" style="font-weight:500;">Beautiful design.</span>
+            </div>
+            <div class="weight-row">
+              <span class="weight-label">600 · SemiBold</span>
+              <span class="weight-sample" style="font-weight:600;">Beautiful design.</span>
+            </div>
+            <div class="weight-row">
+              <span class="weight-label">700 · Bold</span>
+              <span class="weight-sample" style="font-weight:700;">Beautiful design.</span>
+            </div>
+          </div>
+
+          <p>500が存在しない理由は、<strong>コントラストの明確さ</strong>だ。400と600の差は視覚的にはっきりしている。400と500の差は曖昧で、デザインの意図が伝わりにくい。Appleは「曖昧な中間を作らない」という姿勢を、ウェイトの選択にも適用している。</p>
+
+          <h3>各ウェイトの役割</h3>
+          <div style="border:1px solid var(--color-hairline); border-radius:var(--rounded-lg); overflow:hidden; margin:24px 0;">
+            <div style="padding:14px 16px; border-bottom:1px solid var(--color-divider-soft); display:flex; align-items:baseline; gap:16px;">
+              <span style="font-size:17px;font-weight:300;color:var(--color-ink);min-width:160px;">300 — Light</span>
+              <span style="font-size:14px;color:var(--color-ink-muted-48);letter-spacing:-0.224px;">ストアヒーローCTA (18px)、エンバイロメントリード (24px)。「軽やかな空気感」が必要な場面のみ使用。</span>
+            </div>
+            <div style="padding:14px 16px; border-bottom:1px solid var(--color-divider-soft); display:flex; align-items:baseline; gap:16px;">
+              <span style="font-size:17px;font-weight:400;color:var(--color-ink);min-width:160px;">400 — Regular</span>
+              <span style="font-size:14px;color:var(--color-ink-muted-48);letter-spacing:-0.224px;">デフォルト段落・タグライン (28px)・ナビリンク・キャプション。すべての「読まれるテキスト」の標準ウェイト。</span>
+            </div>
+            <div style="padding:14px 16px; border-bottom:1px solid var(--color-divider-soft); display:flex; align-items:baseline; gap:16px;">
+              <span style="font-size:17px;font-weight:600;color:var(--color-ink);min-width:160px;">600 — SemiBold</span>
+              <span style="font-size:14px;color:var(--color-ink-muted-48);letter-spacing:-0.224px;">すべてのヘッドライン・インライン強調・ボタンラベル。Appleの「見出しウェイト」はBold (700)ではなくSemiBold (600)。</span>
+            </div>
+            <div style="padding:14px 16px; display:flex; align-items:baseline; gap:16px;">
+              <span style="font-size:17px;font-weight:700;color:var(--color-ink);min-width:160px;">700 — Bold</span>
+              <span style="font-size:14px;color:var(--color-ink-muted-48);letter-spacing:-0.224px;">タグライン (21px) で、より強い主張が必要なとき限定。スパリングに使用。</span>
+            </div>
+          </div>
+
+          <div class="key-point">
+            <p class="key-point__quote">見出しは600。<br>700はタグラインがさらに主張したいときだけ。<br>500は存在しない。</p>
+            <p class="key-point__attr">Appleウェイト体系の3行ルール</p>
+          </div>
+        </section>
+
+        <!-- 6. ラインハイト -->
+        <section id="lineh" class="prose">
+          <h2>ラインハイトの設計</h2>
+          <p>Appleのラインハイトは「文脈ごとに最適化」されている。ディスプレイサイズは引き締め、ボディは余裕を持たせ、フッターリンクは驚くほど広く取る。</p>
+
+          <div class="lh-demo">
+            <div class="lh-card">
+              <div class="lh-card__label">ディスプレイ</div>
+              <div style="font-size:20px; font-weight:600; line-height:1.07; letter-spacing:-0.28px; color:var(--color-ink);">Big headline text that wraps</div>
+              <div class="lh-card__meta">lh: 1.07<br>タイトに詰めて視覚的な塊を作る</div>
+            </div>
+            <div class="lh-card">
+              <div class="lh-card__label">ボディ</div>
+              <div style="font-size:14px; font-weight:400; line-height:1.47; letter-spacing:-0.374px; color:var(--color-ink);">Appleの本文テキストは17pxで、行間は1.47。読書体験を設計している。</div>
+              <div class="lh-card__meta">lh: 1.47<br>「読む」ための余裕を確保</div>
+            </div>
+            <div class="lh-card">
+              <div class="lh-card__label">フッターリンク</div>
+              <div style="font-size:14px; font-weight:400; line-height:2.41; letter-spacing:0; color:var(--color-ink);">プライバシーポリシー<br>利用規約<br>サイトマップ</div>
+              <div class="lh-card__meta">lh: 2.41<br>密なリスト列を「スキャン可能」にする</div>
+            </div>
+          </div>
+
+          <p>フッターのラインハイト 2.41 は一見「バグ」に見えるほど広い。しかしAppleのフッターは4〜5列のリンクリストが並ぶ情報密度の高い領域だ。ここだけ行間を大きく取ることで、各リンクがタップターゲットとして明確に分離される。</p>
+
+          <div class="callout">
+            <p class="callout__label">記憶すべき3つの数字</p>
+            <p>ディスプレイ: 1.07〜1.19（引き締め）・ボディ: 1.47（読書）・フッターリンク: 2.41（スキャン）。この3つが文脈を決定づける。</p>
+          </div>
+        </section>
+
+        <!-- 7. なぜ17px -->
+        <section id="17px" class="prose">
+          <h2>なぜボディは17pxなのか</h2>
+          <p>現代のWebデザインにおけるボディテキストのデファクトスタンダードは16pxだ。Bootstrapも、Tailwindも、多くのデザインシステムも16pxをベースにしている。Appleは1px大きい17pxを選んでいる。なぜか。</p>
+
+          <div class="before-after">
+            <div class="ba-card">
+              <div class="ba-card__header ba-card__header--before">16px（一般的なSaaS）</div>
+              <div class="ba-card__content" style="background:var(--color-canvas-parchment);">
+                <p style="font-size:16px; font-weight:400; line-height:1.47; letter-spacing:-0.374px; color:var(--color-ink); margin:0;">iPhone 17 Proは、これまでで最も高度なカメラシステムを搭載しています。プロ映像撮影機能が、あなたの手のひらに。</p>
+              </div>
+            </div>
+            <div class="ba-card">
+              <div class="ba-card__header ba-card__header--after">17px（Apple）</div>
+              <div class="ba-card__content" style="background:var(--color-canvas-parchment);">
+                <p style="font-size:17px; font-weight:400; line-height:1.47; letter-spacing:-0.374px; color:var(--color-ink); margin:0;">iPhone 17 Proは、これまでで最も高度なカメラシステムを搭載しています。プロ映像撮影機能が、あなたの手のひらに。</p>
+              </div>
+            </div>
+          </div>
+
+          <p>1pxの差は小さいが、大きなフォントサイズのページ全体に適用されると、「スキャンするサイト」から「<strong>読むサイト</strong>」への変化をもたらす。Appleのページは製品の価値を「説明する」ページだ。ユーザーに速読させるより、ゆっくり読んでもらう方がプロダクトの価値が伝わる。17pxはその哲学の具体的な表れだ。</p>
+
+          <div class="key-point">
+            <p class="key-point__quote">16pxはスキャンのサイズ。<br>17pxは読書のサイズ。<br>Appleは読んでほしい。</p>
+            <p class="key-point__attr">17px選択の理由</p>
+          </div>
+        </section>
+
+        <!-- 演習 -->
+        <section id="exercise">
+          <div class="exercise">
+            <span class="exercise__badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              演習
+            </span>
+            <h2 class="exercise__title">製品タイルをタイプセットする</h2>
+            <p class="exercise__desc">Figma で新しいフレーム（1440×900px）を作成し、Apple的なタイポグラフィシステムを使って製品タイルを1枚タイプセットしてください。ビジュアル（画像）は使わず、テキストとカラーだけで構成します。</p>
+            <ol class="exercise__steps">
+              <li>製品名を <span class="token-name">{typography.display-lg}</span>（40px/600/0/lh1.10）でセット。letter-spacing を 0 に設定する（このサイズではAppleはトラッキングを0にしている）。</li>
+              <li>タグラインを <span class="token-name">{typography.lead}</span>（28px/400/+0.196px/lh1.14）でセット。プレビューして「軽さ」と「支持感」のバランスを感じる。</li>
+              <li>2つのCTAを並べる。1つは solid blue pill、1つは ghost blue pill。両方 <span class="token-name">{typography.body}</span>（17px/400）でラベルをセット。</li>
+              <li>同じタイルをダークバージョンで複製する。背景を #272729 に変え、見出しと本文を白にする。リンクカラーを #2997ff に切り替えるべき箇所を特定する。</li>
+              <li>タイルをライト・ダーク交互に4枚並べ、「タイルリズム」が実際に感じられるかを確認する。</li>
+            </ol>
+          </div>
+        </section>
+
+        <nav class="module-nav">
+          <a class="module-nav__btn" href="module-02.html">← Module 02</a>
+          <span class="module-nav__center">Module 03 / 12</span>
+          <a class="module-nav__btn" href="module-04.html">Module 04 →</a>
+        </nav>
+
+      </article>
+    </main>
+  </div>
+
+</body>
+</html>

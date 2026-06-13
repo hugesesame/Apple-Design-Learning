@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 12 — 総合プロジェクト | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-primary: #0066cc; --color-primary-focus: #0071e3; --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff; --color-canvas-parchment: #f5f5f7; --color-surface-pearl: #fafafc;
+      --color-surface-tile-1: #272729; --color-surface-black: #000000;
+      --color-ink: #1d1d1f; --color-body-on-dark: #ffffff; --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333; --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0; --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px; --rounded-md: 11px; --rounded-lg: 18px; --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); background: var(--color-canvas); -webkit-font-smoothing: antialiased; }
+
+    .global-nav { position: sticky; top: 0; z-index: 100; height: 44px; background: var(--color-surface-black); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .global-nav__logo { font-size: 21px; font-weight: 600; color: #fff; letter-spacing: 0.231px; text-decoration: none; }
+    .global-nav__links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .global-nav__links a { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: -0.12px; text-decoration: none; }
+    .global-nav__links a:hover { color: #fff; }
+    .sub-nav { position: sticky; top: 44px; z-index: 99; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .sub-nav__breadcrumb { display: flex; align-items: center; gap: 6px; }
+    .sub-nav__breadcrumb a { font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .sub-nav__breadcrumb span { font-size: 14px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+    .sub-nav__progress { display: flex; align-items: center; gap: 12px; }
+    .progress-label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .progress-bar { width: 80px; height: 4px; background: var(--color-hairline); border-radius: var(--rounded-pill); overflow: hidden; }
+    .progress-bar__fill { height: 100%; width: 100%; background: var(--color-primary); border-radius: var(--rounded-pill); }
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 96px); max-width: 1280px; margin: 0 auto; }
+    .sidebar { position: sticky; top: 96px; height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--color-hairline); padding: 32px 0; background: var(--color-canvas); }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+    .sidebar__nav { list-style: none; margin-bottom: 32px; }
+    .sidebar__nav li a { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 14px; font-weight: 400; color: var(--color-ink-muted-48); letter-spacing: -0.224px; text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active { color: var(--color-primary); font-weight: 600; background: rgba(0,102,204,0.06); }
+    .sidebar__nav li a .nav-num { font-size: 11px; color: var(--color-ink-muted-48); min-width: 20px; }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-hairline); margin-left: auto; flex-shrink: 0; }
+    .sidebar__nav li a.done .nav-check { background: var(--color-primary); border-color: var(--color-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+    .article { padding: 64px 72px 120px; max-width: 760px; }
+    .article__eyebrow { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .article__title { font-size: 40px; font-weight: 600; line-height: 1.10; letter-spacing: 0; color: var(--color-ink); margin-bottom: 16px; }
+    .article__lead { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-ink-muted-48); margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--color-hairline); }
+    .prose h2 { font-size: 28px; font-weight: 600; line-height: 1.14; letter-spacing: 0.196px; color: var(--color-ink); margin: 56px 0 16px; }
+    .prose h3 { font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; color: var(--color-ink); margin: 40px 0 12px; }
+    .prose p { font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); margin-bottom: 20px; }
+    .prose strong { font-weight: 600; }
+    .callout { background: var(--color-canvas-parchment); border-left: 3px solid var(--color-primary); border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0; padding: 20px 24px; margin: 32px 0; }
+    .callout__label { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout p { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin: 0; }
+    .callout .callout__label { color: var(--color-primary); }
+    .key-point { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; text-align: center; }
+    .key-point__quote { font-size: 24px; font-weight: 300; line-height: 1.5; margin-bottom: 16px; }
+    .key-point__attr { font-size: 14px; font-weight: 400; letter-spacing: -0.224px; }
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .token-name { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); }
+    .exercise { background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; }
+    .exercise__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-primary); background: rgba(0,102,204,0.1); padding: 4px 12px; border-radius: var(--rounded-pill); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+    .exercise__title { font-size: 21px; font-weight: 600; color: var(--color-ink); letter-spacing: 0.231px; margin-bottom: 12px; }
+    .exercise__desc { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin-bottom: 20px; }
+    .exercise__steps { list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+    .exercise__steps li { display: flex; gap: 12px; font-size: 14px; color: var(--color-ink); line-height: 1.43; letter-spacing: -0.224px; counter-increment: step; }
+    .exercise__steps li::before { content: counter(step); width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0 0; border-top: 1px solid var(--color-hairline); margin-top: 80px; }
+    .module-nav__btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__center { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+
+    /* ── Review checklist ─────────────────── */
+    .checklist { display: flex; flex-direction: column; gap: 12px; margin: 24px 0; }
+    .check-item { display: grid; grid-template-columns: 24px 1fr; gap: 12px; align-items: start; padding: 16px 20px; border: 1px solid var(--color-hairline); border-radius: var(--rounded-md); }
+    .check-item__box { width: 20px; height: 20px; border-radius: 4px; border: 2px solid var(--color-primary); margin-top: 1px; flex-shrink: 0; background: rgba(0,102,204,0.06); }
+    .check-item__content { display: flex; flex-direction: column; gap: 4px; }
+    .check-item__title { font-size: 14px; font-weight: 600; color: var(--color-ink); letter-spacing: -0.224px; }
+    .check-item__module { font-size: 11px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.2px; }
+    .check-item__detail { font-size: 13px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; line-height: 1.5; }
+
+    /* ── Summary module grid ──────────────── */
+    .module-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 32px 0; }
+    .module-summary-card { border: 1px solid var(--color-hairline); border-radius: var(--rounded-md); padding: 16px 20px; }
+    .module-summary-card__num { font-size: 11px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.3px; margin-bottom: 6px; }
+    .module-summary-card__title { font-size: 14px; font-weight: 600; color: var(--color-ink); letter-spacing: -0.224px; margin-bottom: 6px; }
+    .module-summary-card__principle { font-size: 12px; color: var(--color-ink-muted-48); line-height: 1.5; }
+
+    /* ── Completion banner ────────────────── */
+    .completion-banner { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 48px 40px; text-align: center; margin: 48px 0; }
+    .completion-banner__icon { font-size: 48px; margin-bottom: 16px; }
+    .completion-banner__title { font-size: 32px; font-weight: 600; color: var(--color-body-on-dark); line-height: 1.14; margin-bottom: 12px; }
+    .completion-banner__sub { font-size: 17px; font-weight: 300; color: var(--color-body-muted); line-height: 1.47; margin-bottom: 32px; }
+    .completion-banner__cta { display: inline-flex; align-items: center; padding: 12px 24px; border-radius: 9999px; background: var(--color-primary-on-dark); color: #fff; font-size: 17px; font-weight: 400; text-decoration: none; }
+
+    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .article { padding: 40px 24px 80px; } .module-summary-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a><span>›</span><span>Module 12</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">12 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 12</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro"    class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#review"  ><span class="nav-num">2.</span> 12モジュールの総まとめ<div class="nav-check"></div></a></li>
+        <li><a href="#checklist"><span class="nav-num">3.</span> 最終チェックリスト<div class="nav-check"></div></a></li>
+        <li><a href="#project" ><span class="nav-num">4.</span> 総合プロジェクト<div class="nav-check"></div></a></li>
+        <li><a href="#criteria"><span class="nav-num">5.</span> 評価基準<div class="nav-check"></div></a></li>
+        <li><a href="#beyond"  ><span class="nav-num">6.</span> この先へ<div class="nav-check"></div></a></li>
+        <li><a href="#complete"><span class="nav-num">7.</span> 修了<div class="nav-check"></div></a></li>
+      </ul>
+      <p class="sidebar__section-label">全モジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-01.html" class="done"><span class="nav-num">01.</span> デザイン哲学<div class="nav-check"></div></a></li>
+        <li><a href="module-02.html" class="done"><span class="nav-num">02.</span> カラーシステム<div class="nav-check"></div></a></li>
+        <li><a href="module-03.html" class="done"><span class="nav-num">03.</span> タイポグラフィ<div class="nav-check"></div></a></li>
+        <li><a href="module-04.html" class="done"><span class="nav-num">04.</span> スペーシング<div class="nav-check"></div></a></li>
+        <li><a href="module-05.html" class="done"><span class="nav-num">05.</span> コンポーネント<div class="nav-check"></div></a></li>
+        <li><a href="module-06.html" class="done"><span class="nav-num">06.</span> エレベーション<div class="nav-check"></div></a></li>
+        <li><a href="module-07.html" class="done"><span class="nav-num">07.</span> レスポンシブ<div class="nav-check"></div></a></li>
+        <li><a href="module-08.html" class="done"><span class="nav-num">08.</span> トークン実装<div class="nav-check"></div></a></li>
+        <li><a href="module-09.html" class="done"><span class="nav-num">09.</span> モーション<div class="nav-check"></div></a></li>
+        <li><a href="module-10.html" class="done"><span class="nav-num">10.</span> アクセシビリティ<div class="nav-check"></div></a></li>
+        <li><a href="module-11.html" class="done"><span class="nav-num">11.</span> コンテンツ設計<div class="nav-check"></div></a></li>
+        <li><a href="module-12.html" class="active"><span class="nav-num">12.</span> 総合プロジェクト<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <article class="article">
+        <p class="article__eyebrow">Module 12 · 修了</p>
+        <h1 class="article__title">総合プロジェクト</h1>
+        <p class="article__lead">12のモジュールで学んだすべてを統合し、<strong>Appleデザイン言語に準拠した実際のプロダクトページ</strong>を設計・実装する。これが最終課題だ。</p>
+
+        <section id="intro" class="prose">
+          <h2>最終モジュールへようこそ</h2>
+          <p>あなたはここまで、Appleのデザインシステムを構成する12の領域を学んできた。哲学・カラー・タイポグラフィ・スペーシング・コンポーネント・エレベーション・レスポンシブ・トークン・モーション・アクセシビリティ・コンテンツ——これらすべては独立した知識ではなく、<strong>互いを支え合うシステム</strong>だ。</p>
+          <p>最終モジュールの目的は、この知識を「知っている」から「使える」へ変換することだ。アウトプットなき学習は知識のストック。アウトプットがあって初めてスキルになる。</p>
+
+          <div class="key-point">
+            <p class="key-point__quote">学んだことは、作ることで初めて<br>あなたのものになる。</p>
+            <p class="key-point__attr">Module 12 — Final Project</p>
+          </div>
+        </section>
+
+        <section id="review" class="prose">
+          <h2>12モジュールの核心を振り返る</h2>
+          <p>各モジュールから「絶対に忘れてはならない1つの原則」を抽出する。</p>
+
+          <div class="module-summary-grid">
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 01 · 哲学</div>
+              <div class="module-summary-card__title">Less, but better</div>
+              <div class="module-summary-card__principle">アクセントカラーは1色。影は1種類。フォントウェイトは4段階。「削ること」がAppleのデザイン行為だ。</div>
+            </div>
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 02 · カラー</div>
+              <div class="module-summary-card__title">セマンティックカラー</div>
+              <div class="module-summary-card__principle">#0066ccを直接使わない。{colors.primary}を使う。意図に名前を付けることで、変更が伝播する。</div>
+            </div>
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 03 · タイポグラフィ</div>
+              <div class="module-summary-card__title">17pxは設計値</div>
+              <div class="module-summary-card__principle">ボディテキストは17px（16pxではない）。Appleの読書ペースへの配慮だ。letter-spacingは必ず設定する。</div>
+            </div>
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 04 · スペーシング</div>
+              <div class="module-summary-card__title">80pxの台座</div>
+              <div class="module-summary-card__principle">セクション垂直パディング80pxは「製品を美術館の台座に乗せる」行為だ。余白の量が製品の価値を示す。</div>
+            </div>
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 05 · コンポーネント</div>
+              <div class="module-summary-card__title">ピルはアクションの文法</div>
+              <div class="module-summary-card__principle">border-radius: 9999pxはCTAとアクション要素のみ。角丸8pxはユーティリティ。この文法を混ぜない。</div>
+            </div>
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 06 · エレベーション</div>
+              <div class="module-summary-card__title">UIに影を使わない</div>
+              <div class="module-summary-card__principle">box-shadowは製品レンダリング専用。UIの階層はカラー変化・ヘアライン・backdrop-filterで表現する。</div>
+            </div>
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 07 · レスポンシブ</div>
+              <div class="module-summary-card__title">縮小ではなく再設計</div>
+              <div class="module-summary-card__principle">モバイルはデスクトップのサブセットではない。8つのブレークポイントで、それぞれに最適な体験を作る。</div>
+            </div>
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 08 · トークン</div>
+              <div class="module-summary-card__title">意図に名前を付ける</div>
+              <div class="module-summary-card__principle">Global → Alias → Componentの3層。1箇所の変更でシステム全体を更新できる構造がトークンの目的だ。</div>
+            </div>
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 09 · モーション</div>
+              <div class="module-summary-card__title">ease-outと0.6秒上限</div>
+              <div class="module-summary-card__principle">Appleのアニメーションはease-outで短く終わる。装飾でなく情報の遷移を助ける機能的モーションだ。</div>
+            </div>
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 10 · アクセシビリティ</div>
+              <div class="module-summary-card__title">コントラスト比4.5:1</div>
+              <div class="module-summary-card__principle">WCAG AA達成は全ユーザーへの責任。:focus-visible・セマンティックHTML・reduced-motionは必須実装だ。</div>
+            </div>
+            <div class="module-summary-card">
+              <div class="module-summary-card__num">MODULE 11 · コンテンツ</div>
+              <div class="module-summary-card__title">20字以内の断言</div>
+              <div class="module-summary-card__principle">ヒーローコピーは主語を省いた断言。CTAは3語以内。テキストを削るほど製品が前に出る。</div>
+            </div>
+            <div class="module-summary-card" style="border-color:var(--color-primary); background:rgba(0,102,204,0.03);">
+              <div class="module-summary-card__num" style="color:var(--color-primary);">MODULE 12 · 統合</div>
+              <div class="module-summary-card__title">すべては一つのシステム</div>
+              <div class="module-summary-card__principle">11の原則はバラバラに機能しない。互いが条件となり支え合うとき、「Appleらしさ」が生まれる。</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="checklist" class="prose">
+          <h2>最終提出チェックリスト</h2>
+          <p>プロジェクトを提出する前に、以下のすべてを確認する。1つでも未達成の項目があれば、そこがまだ学習中の領域だ。</p>
+
+          <div class="checklist">
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 01 · 哲学</div>
+                <div class="check-item__title">アクセントカラーは1色のみ</div>
+                <div class="check-item__detail">{colors.primary}（#0066cc）以外の色でCTAやリンクが着色されていないか確認する。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 02 · カラー</div>
+                <div class="check-item__title">すべてのカラーがトークン参照</div>
+                <div class="check-item__detail">CSSに直接 #0066cc と書いていない。var(--color-primary) で参照している。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 03 · タイポグラフィ</div>
+                <div class="check-item__title">ボディ17px / letter-spacing設定済み</div>
+                <div class="check-item__detail">font-size: 17px。letter-spacing: -0.374px（ボディ）。font-weight: 300/400/600/700のみ。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 04 · スペーシング</div>
+                <div class="check-item__title">セクションパディング80px以上</div>
+                <div class="check-item__detail">各セクションの上下パディングが{spacing.section}=80pxになっているか確認する。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 05 · コンポーネント</div>
+                <div class="check-item__title">ボタンの形状文法が正しい</div>
+                <div class="check-item__detail">CTAはpill(9999px)。ユーティリティは8px。カードセカンダリは11px。混在していない。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 06 · エレベーション</div>
+                <div class="check-item__title">UIコンポーネントにbox-shadowなし</div>
+                <div class="check-item__detail">カード・ボタン・ナビに box-shadow が使われていない。製品ビジュアルのみに限定されている。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 07 · レスポンシブ</div>
+                <div class="check-item__title">833px / 419pxで崩れない</div>
+                <div class="check-item__detail">DevToolsで両ブレークポイントを確認。テキスト重複・はみ出し・タッチターゲット44px未満がない。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 08 · トークン</div>
+                <div class="check-item__title">CSS変数が3層で定義されている</div>
+                <div class="check-item__detail">:rootにGlobal・Aliasトークンが定義されており、コンポーネントはAliasを参照している。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 09 · モーション</div>
+                <div class="check-item__title">ボタンactive: scale(0.95)実装済み</div>
+                <div class="check-item__detail">button:active { transform: scale(0.95); } が 150ms ease-out で実装されている。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 09 · モーション</div>
+                <div class="check-item__title">prefers-reduced-motion対応済み</div>
+                <div class="check-item__detail">@media (prefers-reduced-motion: reduce) でアニメーションが無効化される。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 10 · アクセシビリティ</div>
+                <div class="check-item__title">Lighthouse アクセシビリティ90+</div>
+                <div class="check-item__detail">ChromeのLighthouseでアクセシビリティスコア90点以上を達成している。</div>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-item__box"></div>
+              <div class="check-item__content">
+                <div class="check-item__module">MODULE 11 · コンテンツ</div>
+                <div class="check-item__title">ヒーローコピーが20字以内の断言</div>
+                <div class="check-item__detail">Lorem ipsumが残っていない。CTAが「今すぐ」などの煽りワードを含まない。</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="project" class="prose">
+          <h2>総合プロジェクト — 仕様</h2>
+          <p>実在または架空のプロダクト1点の製品ランディングページを、Figma（デザイン）とHTML/CSS（実装）の両方で作成する。</p>
+
+          <h3>必須セクション</h3>
+          <ul style="margin:0 0 20px 20px; display:flex; flex-direction:column; gap:10px;">
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>Global Nav</strong> — 44px、黒背景、スティッキー</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>Sub Nav</strong> — 52px、Frosted Glass、製品名＋CTA</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>Hero タイル</strong> — ダーク背景、20字以内のタイトル、2CTAボタン</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>Features タイル</strong> — パーチメント背景、3つ以上の機能説明</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>Product タイル</strong> — ライト背景、製品ビジュアル（product shadow）</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>フッター</strong> — 5カラム、全フルwidthブラック</li>
+          </ul>
+
+          <h3>技術要件</h3>
+          <ul style="margin:0 0 20px 20px; display:flex; flex-direction:column; gap:10px;">
+            <li style="font-size:17px; letter-spacing:-0.374px;">CSS変数（3層トークン構造）を使用する</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;">833px と 419px のブレークポイントで適切に表示される</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;">linear-gradient をプロダクトモックアップに使用しない</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;">UIコンポーネントに box-shadow を使用しない</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;">prefers-reduced-motion に対応する</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;">Lighthouse アクセシビリティスコア 90 以上</li>
+          </ul>
+
+          <div class="callout">
+            <p class="callout__label">Figmaの提出も必須</p>
+            <p>HTMLの実装だけでなく、Figmaファイルも提出する。Variables（3層）を設定し、コンポーネントライブラリとして整理すること。デザインとコードが一致していることを確認する。</p>
+          </div>
+        </section>
+
+        <section id="criteria" class="prose">
+          <h2>評価基準</h2>
+
+          <div style="display:flex; flex-direction:column; gap:12px; margin:24px 0;">
+            <div style="display:grid; grid-template-columns:1fr 64px; gap:16px; padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-md); align-items:center;">
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">デザインシステムへの準拠</div>
+                <div style="font-size:12px; color:var(--color-ink-muted-48);">トークン・コンポーネント・エレベーション・モーションのルールが守られているか</div>
+              </div>
+              <div style="font-size:20px; font-weight:600; color:var(--color-primary); text-align:right;">30点</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 64px; gap:16px; padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-md); align-items:center;">
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">コンテンツの質</div>
+                <div style="font-size:12px; color:var(--color-ink-muted-48);">ヒーローコピー・CTA・数字表現がAppleボイスに沿っているか</div>
+              </div>
+              <div style="font-size:20px; font-weight:600; color:var(--color-primary); text-align:right;">20点</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 64px; gap:16px; padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-md); align-items:center;">
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">レスポンシブ対応</div>
+                <div style="font-size:12px; color:var(--color-ink-muted-48);">833px/419pxで崩れがないか。モバイルが「縮小」ではなく「再設計」されているか</div>
+              </div>
+              <div style="font-size:20px; font-weight:600; color:var(--color-primary); text-align:right;">20点</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 64px; gap:16px; padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-md); align-items:center;">
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">アクセシビリティ</div>
+                <div style="font-size:12px; color:var(--color-ink-muted-48);">Lighthouse 90+、:focus-visible、reduced-motion対応</div>
+              </div>
+              <div style="font-size:20px; font-weight:600; color:var(--color-primary); text-align:right;">20点</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 64px; gap:16px; padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-md); align-items:center;">
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">コードの品質</div>
+                <div style="font-size:12px; color:var(--color-ink-muted-48);">CSS変数3層・セマンティックHTML・クリーンな構造</div>
+              </div>
+              <div style="font-size:20px; font-weight:600; color:var(--color-primary); text-align:right;">10点</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 64px; gap:16px; padding:16px 20px; background:rgba(0,102,204,0.04); border:2px solid var(--color-primary); border-radius:var(--rounded-md); align-items:center;">
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-primary);">合計</div>
+              </div>
+              <div style="font-size:24px; font-weight:600; color:var(--color-primary); text-align:right;">100点</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="beyond" class="prose">
+          <h2>この先へ</h2>
+          <p>design.mdはAppleのデザイン言語の<strong>入り口</strong>だ。design.mdが記録しているのはapple.comの表層パターンであり、Appleが実際に使っているプロセスや意思決定の詳細は公開されていない。</p>
+          <p>ここから先の学習パスとして、以下を推奨する。</p>
+
+          <div style="display:flex; flex-direction:column; gap:12px; margin:24px 0;">
+            <div style="padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm); display:flex; align-items:start; gap:12px;">
+              <div style="width:8px; height:8px; border-radius:50%; background:var(--color-primary); margin-top:6px; flex-shrink:0;"></div>
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin-bottom:2px;">Apple Human Interface Guidelines</div>
+                <div style="font-size:13px; color:var(--color-ink-muted-48);">developer.apple.com — iOS/macOSのUI設計原則。apple.comとは別の設計言語を持つが、哲学は共通している。</div>
+              </div>
+            </div>
+            <div style="padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm); display:flex; align-items:start; gap:12px;">
+              <div style="width:8px; height:8px; border-radius:50%; background:var(--color-primary); margin-top:6px; flex-shrink:0;"></div>
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin-bottom:2px;">実際のapple.comを定期的に監査する</div>
+                <div style="font-size:13px; color:var(--color-ink-muted-48);">Appleは月単位でデザインを更新する。DevToolsで新しい値を発見し、design.mdとの差分を記録し続けることが上達の道だ。</div>
+              </div>
+            </div>
+            <div style="padding:16px 20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-sm); display:flex; align-items:start; gap:12px;">
+              <div style="width:8px; height:8px; border-radius:50%; background:var(--color-primary); margin-top:6px; flex-shrink:0;"></div>
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin-bottom:2px;">自分のデザインシステムを作る</div>
+                <div style="font-size:13px; color:var(--color-ink-muted-48);">学んだトークン設計・コンポーネント解剖学・エレベーション哲学を、自分のプロジェクトに適用したオリジナルのシステムを構築する。</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="complete">
+          <div class="completion-banner">
+            <div class="completion-banner__icon">★</div>
+            <h2 class="completion-banner__title">修了。</h2>
+            <p class="completion-banner__sub">12のモジュールをすべて完走したあなたは、Appleデザイン言語を「感覚」ではなく「構造」として理解している。それが次のプロジェクトでの差になる。</p>
+            <a href="index.html" class="completion-banner__cta">Apple Design に戻る</a>
+          </div>
+        </section>
+
+        <nav class="module-nav">
+          <a class="module-nav__btn" href="module-11.html">← Module 11</a>
+          <span class="module-nav__center">Module 12 / 12 — 完了</span>
+          <a class="module-nav__btn" href="index.html">Apple Design →</a>
+        </nav>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

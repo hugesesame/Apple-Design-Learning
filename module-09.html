@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 09 — モーションとアニメーション | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-primary: #0066cc; --color-primary-focus: #0071e3; --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff; --color-canvas-parchment: #f5f5f7; --color-surface-pearl: #fafafc;
+      --color-surface-tile-1: #272729; --color-surface-black: #000000;
+      --color-ink: #1d1d1f; --color-body-on-dark: #ffffff; --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333; --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0; --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px; --rounded-md: 11px; --rounded-lg: 18px; --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); background: var(--color-canvas); -webkit-font-smoothing: antialiased; }
+
+    .global-nav { position: sticky; top: 0; z-index: 100; height: 44px; background: var(--color-surface-black); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .global-nav__logo { font-size: 21px; font-weight: 600; color: #fff; letter-spacing: 0.231px; text-decoration: none; }
+    .global-nav__links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .global-nav__links a { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: -0.12px; text-decoration: none; }
+    .global-nav__links a:hover { color: #fff; }
+    .sub-nav { position: sticky; top: 44px; z-index: 99; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .sub-nav__breadcrumb { display: flex; align-items: center; gap: 6px; }
+    .sub-nav__breadcrumb a { font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .sub-nav__breadcrumb span { font-size: 14px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+    .sub-nav__progress { display: flex; align-items: center; gap: 12px; }
+    .progress-label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .progress-bar { width: 80px; height: 4px; background: var(--color-hairline); border-radius: var(--rounded-pill); overflow: hidden; }
+    .progress-bar__fill { height: 100%; width: 75%; background: var(--color-primary); border-radius: var(--rounded-pill); }
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 96px); max-width: 1280px; margin: 0 auto; }
+    .sidebar { position: sticky; top: 96px; height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--color-hairline); padding: 32px 0; background: var(--color-canvas); }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+    .sidebar__nav { list-style: none; margin-bottom: 32px; }
+    .sidebar__nav li a { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 14px; font-weight: 400; color: var(--color-ink-muted-48); letter-spacing: -0.224px; text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active { color: var(--color-primary); font-weight: 600; background: rgba(0,102,204,0.06); }
+    .sidebar__nav li a .nav-num { font-size: 11px; color: var(--color-ink-muted-48); min-width: 20px; }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-hairline); margin-left: auto; flex-shrink: 0; }
+    .sidebar__nav li a.done .nav-check { background: var(--color-primary); border-color: var(--color-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+    .article { padding: 64px 72px 120px; max-width: 760px; }
+    .article__eyebrow { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .article__title { font-size: 40px; font-weight: 600; line-height: 1.10; letter-spacing: 0; color: var(--color-ink); margin-bottom: 16px; }
+    .article__lead { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-ink-muted-48); margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--color-hairline); }
+    .prose h2 { font-size: 28px; font-weight: 600; line-height: 1.14; letter-spacing: 0.196px; color: var(--color-ink); margin: 56px 0 16px; }
+    .prose h3 { font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; color: var(--color-ink); margin: 40px 0 12px; }
+    .prose p { font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); margin-bottom: 20px; }
+    .prose strong { font-weight: 600; }
+    .callout { background: var(--color-canvas-parchment); border-left: 3px solid var(--color-primary); border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0; padding: 20px 24px; margin: 32px 0; }
+    .callout__label { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout p { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin: 0; }
+    .callout .callout__label { color: var(--color-primary); }
+    .key-point { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; text-align: center; }
+    .key-point__quote { font-size: 24px; font-weight: 300; line-height: 1.5; margin-bottom: 16px; }
+    .key-point__attr { font-size: 14px; font-weight: 400; letter-spacing: -0.224px; }
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .token-name { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); }
+    .exercise { background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; }
+    .exercise__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-primary); background: rgba(0,102,204,0.1); padding: 4px 12px; border-radius: var(--rounded-pill); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+    .exercise__title { font-size: 21px; font-weight: 600; color: var(--color-ink); letter-spacing: 0.231px; margin-bottom: 12px; }
+    .exercise__desc { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin-bottom: 20px; }
+    .exercise__steps { list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+    .exercise__steps li { display: flex; gap: 12px; font-size: 14px; color: var(--color-ink); line-height: 1.43; letter-spacing: -0.224px; counter-increment: step; }
+    .exercise__steps li::before { content: counter(step); width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0 0; border-top: 1px solid var(--color-hairline); margin-top: 80px; }
+    .module-nav__btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__center { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .code-block { background: var(--color-surface-tile-1); border-radius: var(--rounded-sm); padding: 20px 24px; margin: 20px 0; font-family: 'SF Mono','Fira Code',monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; color: #e8e8ed; }
+    .c-comment { color: #636366; } .c-prop { color: #a8daff; } .c-val { color: #ffa657; } .c-sel { color: #79c0ff; } .c-fn { color: #d2a8ff; } .c-num { color: #98c379; }
+
+    /* ── Easing visualiser ─────────────────── */
+    .easing-grid { display: flex; flex-direction: column; gap: 16px; margin: 32px 0; }
+    .easing-row { display: grid; grid-template-columns: 140px 1fr 80px; align-items: center; gap: 16px; }
+    .easing-label { font-size: 13px; font-weight: 600; color: var(--color-ink); letter-spacing: -0.224px; }
+    .easing-track { height: 8px; background: var(--color-divider-soft); border-radius: var(--rounded-pill); position: relative; overflow: visible; }
+    .easing-ball { width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary); position: absolute; top: 50%; transform: translate(0, -50%); cursor: default; }
+    .easing-row:hover .easing-ball { animation: none; }
+    .easing-ball--linear   { animation: slide-linear   1.6s linear     infinite alternate; }
+    .easing-ball--ease-out { animation: slide-easeout  1.6s ease-out   infinite alternate; }
+    .easing-ball--ease-in  { animation: slide-easein   1.6s ease-in    infinite alternate; }
+    .easing-ball--spring   { animation: slide-spring   1.6s cubic-bezier(0.34,1.56,0.64,1) infinite alternate; }
+    @keyframes slide-linear   { from { left: 0; } to { left: calc(100% - 20px); } }
+    @keyframes slide-easeout  { from { left: 0; } to { left: calc(100% - 20px); } }
+    @keyframes slide-easein   { from { left: 0; } to { left: calc(100% - 20px); } }
+    @keyframes slide-spring   { from { left: 0; } to { left: calc(100% - 20px); } }
+    .easing-note { font-family: monospace; font-size: 11px; color: var(--color-ink-muted-48); }
+
+    /* ── Duration table ────────────────────── */
+    .dur-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .dur-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .dur-table td { padding: 10px 12px; font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: top; }
+    .dur-table tr:last-child td { border-bottom: none; }
+
+    /* ── Active state demo ─────────────────── */
+    .active-demo { display: flex; gap: 32px; align-items: center; padding: 32px; background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); margin: 24px 0; flex-wrap: wrap; }
+    .demo-btn { display: inline-flex; align-items: center; padding: 11px 22px; border-radius: 9999px; background: var(--color-primary); color: #fff; font-size: 17px; font-weight: 400; border: none; cursor: pointer; transition: transform 0.15s ease-out; user-select: none; }
+    .demo-btn:active { transform: scale(0.95); }
+    .demo-btn-bad { display: inline-flex; align-items: center; padding: 11px 22px; border-radius: 9999px; background: #666; color: #fff; font-size: 17px; font-weight: 400; border: none; cursor: pointer; transition: opacity 0.3s; }
+    .demo-btn-bad:active { opacity: 0.5; }
+
+    /* ── Scroll reveal demo ─────────────────── */
+    .scroll-reveal-demo { border: 1px solid var(--color-hairline); border-radius: var(--rounded-lg); overflow: hidden; margin: 24px 0; }
+    .reveal-before { padding: 20px 24px; background: #fff; border-bottom: 1px dashed rgba(0,102,204,0.2); display: flex; align-items: center; gap: 12px; }
+    .reveal-after  { padding: 20px 24px; background: #fff; display: flex; align-items: center; gap: 12px; }
+    .reveal-box { width: 48px; height: 48px; background: #d1d1d6; border-radius: var(--rounded-sm); flex-shrink: 0; }
+    .reveal-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--rounded-pill); }
+    .reveal-badge--before { background: rgba(234,67,53,0.1); color: #c5221f; }
+    .reveal-badge--after  { background: rgba(0,102,204,0.1); color: var(--color-primary); }
+
+    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .article { padding: 40px 24px 80px; } .easing-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a><span>›</span><span>Module 09</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">9 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 09</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro"      class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#philosophy"><span class="nav-num">2.</span> モーション哲学<div class="nav-check"></div></a></li>
+        <li><a href="#easing"    ><span class="nav-num">3.</span> イージング関数<div class="nav-check"></div></a></li>
+        <li><a href="#duration"  ><span class="nav-num">4.</span> デュレーション<div class="nav-check"></div></a></li>
+        <li><a href="#active"    ><span class="nav-num">5.</span> アクティブ状態<div class="nav-check"></div></a></li>
+        <li><a href="#scroll"    ><span class="nav-num">6.</span> スクロールアニメーション<div class="nav-check"></div></a></li>
+        <li><a href="#reduced"   ><span class="nav-num">7.</span> Reduced Motion<div class="nav-check"></div></a></li>
+        <li><a href="#exercise"  ><span class="nav-num">8.</span> 演習<div class="nav-check"></div></a></li>
+      </ul>
+      <p class="sidebar__section-label">モジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-08.html" class="done"><span class="nav-num">08.</span> トークン実装<div class="nav-check"></div></a></li>
+        <li><a href="module-09.html" class="active"><span class="nav-num">09.</span> モーション<div class="nav-check"></div></a></li>
+        <li><a href="module-10.html"><span class="nav-num">10.</span> アクセシビリティ<div class="nav-check"></div></a></li>
+        <li><a href="module-11.html"><span class="nav-num">11.</span> コンテンツ設計<div class="nav-check"></div></a></li>
+        <li><a href="module-12.html"><span class="nav-num">12.</span> 総合プロジェクト<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <article class="article">
+        <p class="article__eyebrow">Module 09 · モーション</p>
+        <h1 class="article__title">モーションとアニメーション</h1>
+        <p class="article__lead">Appleのアニメーションは「装飾」ではない。<strong>情報の遷移を助け、ユーザーの注意を適切に誘導する</strong>機能的なツールだ。</p>
+
+        <section id="intro" class="prose">
+          <h2>このモジュールで学ぶこと</h2>
+          <p>apple.comは控えめだがきわめて精密なアニメーションで動く。製品ページのスクロールで製品が「浮かび上がる」感覚、ボタンを押したときの「押し込まれる」確かな応答感——これらはすべて設計されたモーションだ。</p>
+          <p>このモジュールでは、Appleが採用するイージング関数・デュレーション・アクティブ状態のアニメーション、そしてアクセシビリティへの配慮（Reduced Motion）を学ぶ。</p>
+          <div class="callout">
+            <p class="callout__label">大前提</p>
+            <p>アニメーションは「気づかれないこと」が最高の状態だ。ユーザーが「このアニメーションすごい」と感じた時点で、アニメーションはコンテンツの邪魔をしている。</p>
+          </div>
+        </section>
+
+        <section id="philosophy" class="prose">
+          <h2>モーション哲学</h2>
+          <p>Appleのモーションには3原則がある。</p>
+          <div style="display:flex; flex-direction:column; gap:16px; margin:32px 0;">
+            <div style="display:grid; grid-template-columns:48px 1fr; gap:16px; padding:20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-md);">
+              <div style="width:48px; height:48px; border-radius:50%; background:rgba(0,102,204,0.08); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:600; color:var(--color-primary);">1</div>
+              <div>
+                <div style="font-size:17px; font-weight:600; color:var(--color-ink); letter-spacing:-0.374px; margin-bottom:4px;">自然（Natural）</div>
+                <div style="font-size:14px; color:var(--color-ink-muted-48); letter-spacing:-0.224px; line-height:1.5;">物理法則に従うモーション。ease-out（始めが速く、終わりが遅い）は現実世界の摩擦をシミュレートする。</div>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:48px 1fr; gap:16px; padding:20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-md);">
+              <div style="width:48px; height:48px; border-radius:50%; background:rgba(0,102,204,0.08); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:600; color:var(--color-primary);">2</div>
+              <div>
+                <div style="font-size:17px; font-weight:600; color:var(--color-ink); letter-spacing:-0.374px; margin-bottom:4px;">機能的（Functional）</div>
+                <div style="font-size:14px; color:var(--color-ink-muted-48); letter-spacing:-0.224px; line-height:1.5;">モーションは目的を持つ。「どこから来たか」「どこへ行くか」を伝える。装飾のためのアニメーションは存在しない。</div>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:48px 1fr; gap:16px; padding:20px; border:1px solid var(--color-hairline); border-radius:var(--rounded-md);">
+              <div style="width:48px; height:48px; border-radius:50%; background:rgba(0,102,204,0.08); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:600; color:var(--color-primary);">3</div>
+              <div>
+                <div style="font-size:17px; font-weight:600; color:var(--color-ink); letter-spacing:-0.374px; margin-bottom:4px;">控えめ（Restrained）</div>
+                <div style="font-size:14px; color:var(--color-ink-muted-48); letter-spacing:-0.224px; line-height:1.5;">短く、速く、静かに。デュレーションは最大でも0.6秒。注意を奪わない。</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="key-point">
+            <p class="key-point__quote">アニメーションは「製品を見せる」のではなく<br>「製品を理解させる」ために存在する。</p>
+            <p class="key-point__attr">Apple Human Interface Guidelines — Motion</p>
+          </div>
+        </section>
+
+        <section id="easing" class="prose">
+          <h2>イージング関数</h2>
+          <p>Appleのモーションで最も多用されるイージングは <strong>ease-out</strong> だ。スプリングアニメーション（iOS的）はweb上ではcubic-bezierで近似する。</p>
+
+          <div class="easing-grid">
+            <div class="easing-row">
+              <div class="easing-label">Linear（禁止）</div>
+              <div class="easing-track">
+                <div class="easing-ball easing-ball--linear" style="background:#e04040;"></div>
+              </div>
+              <div class="easing-note">機械的。Appleでは使わない。</div>
+            </div>
+            <div class="easing-row">
+              <div class="easing-label">ease-in（禁止）</div>
+              <div class="easing-track">
+                <div class="easing-ball easing-ball--ease-in" style="background:#e04040;"></div>
+              </div>
+              <div class="easing-note">遅く始まる。重く感じる。</div>
+            </div>
+            <div class="easing-row">
+              <div class="easing-label">ease-out（推奨）</div>
+              <div class="easing-track">
+                <div class="easing-ball easing-ball--ease-out"></div>
+              </div>
+              <div class="easing-note">最自然。多くの場面で使う。</div>
+            </div>
+            <div class="easing-row">
+              <div class="easing-label">Spring（推奨）</div>
+              <div class="easing-track">
+                <div class="easing-ball easing-ball--spring" style="background:#34c759;"></div>
+              </div>
+              <div class="easing-note">cubic-bezier(0.34,1.56,0.64,1)</div>
+            </div>
+          </div>
+
+          <div class="code-block">
+<span class="c-comment">/* Appleが使うイージング定義 */</span>
+<span class="c-sel">:root</span> {
+  <span class="c-prop">--ease-out</span>: <span class="c-fn">cubic-bezier</span>(<span class="c-num">0.25</span>, <span class="c-num">0.46</span>, <span class="c-num">0.45</span>, <span class="c-num">0.94</span>);
+  <span class="c-prop">--ease-spring</span>: <span class="c-fn">cubic-bezier</span>(<span class="c-num">0.34</span>, <span class="c-num">1.56</span>, <span class="c-num">0.64</span>, <span class="c-num">1</span>);
+  <span class="c-prop">--ease-decelerate</span>: <span class="c-fn">cubic-bezier</span>(<span class="c-num">0</span>, <span class="c-num">0</span>, <span class="c-num">0.2</span>, <span class="c-num">1</span>);
+}</div>
+        </section>
+
+        <section id="duration" class="prose">
+          <h2>デュレーション（持続時間）</h2>
+          <p>短いアニメーションほどAppleらしい。0.6秒を超えるアニメーションはほぼ存在しない。</p>
+
+          <table class="dur-table">
+            <thead><tr><th>カテゴリ</th><th>デュレーション</th><th>用途</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>超高速</strong></td>
+                <td>80–150ms</td>
+                <td>ボタンのActive状態（scale）、マイクロフィードバック</td>
+              </tr>
+              <tr>
+                <td><strong>高速</strong></td>
+                <td>200–300ms</td>
+                <td>ホバー時の色変化、フォーカスリング、ツールチップ出現</td>
+              </tr>
+              <tr>
+                <td><strong>標準</strong></td>
+                <td>300–400ms</td>
+                <td>コンポーネントの展開・折り畳み、モーダルの出現</td>
+              </tr>
+              <tr>
+                <td><strong>スロー</strong></td>
+                <td>500–600ms</td>
+                <td>ページ遷移、スクロールでのコンテンツ出現（上限）</td>
+              </tr>
+              <tr>
+                <td><strong>禁止域</strong></td>
+                <td>600ms以上</td>
+                <td>ユーザーを待たせる。Appleのプロダクトには存在しない。</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout">
+            <p class="callout__label">体感速度のトリック</p>
+            <p>同じ300msでも ease-out と linear では速く感じる方が違う。ease-out の方が「始まりが速い」ため体感が短い。Appleが ease-out を選ぶ理由のひとつだ。</p>
+          </div>
+        </section>
+
+        <section id="active" class="prose">
+          <h2>アクティブ状態のアニメーション</h2>
+          <p>design.mdに記録されているボタンのアクティブ状態は <span class="token-name">transform: scale(0.95)</span> だ。これはAppleの最も重要なマイクロインタラクションだ。</p>
+
+          <div class="active-demo">
+            <div>
+              <p style="font-size:12px; font-weight:600; color:var(--color-ink-muted-48); letter-spacing:0.3px; text-transform:uppercase; margin-bottom:12px;">正しい実装（押してみて）</p>
+              <button class="demo-btn">詳しく見る</button>
+              <p style="font-size:11px; color:var(--color-ink-muted-48); margin-top:8px;">scale(0.95) · 150ms · ease-out</p>
+            </div>
+            <div>
+              <p style="font-size:12px; font-weight:600; color:var(--color-ink-muted-48); letter-spacing:0.3px; text-transform:uppercase; margin-bottom:12px;">誤った実装（押してみて）</p>
+              <button class="demo-btn-bad">詳しく見る</button>
+              <p style="font-size:11px; color:var(--color-ink-muted-48); margin-top:8px;">opacity変化 → 「暗くなる」だけ</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+<span class="c-sel">.button-primary</span> {
+  <span class="c-prop">transition</span>: <span class="c-val">transform</span> <span class="c-num">0.15s</span> <span class="c-fn">cubic-bezier</span>(<span class="c-num">0.25</span>, <span class="c-num">0.46</span>, <span class="c-num">0.45</span>, <span class="c-num">0.94</span>);
+}
+<span class="c-sel">.button-primary:active</span> {
+  <span class="c-prop">transform</span>: <span class="c-fn">scale</span>(<span class="c-num">0.95</span>);
+}
+
+<span class="c-comment">/* transition はactiveプロパティのみに限定する */</span>
+<span class="c-comment">/* transition: all はパフォーマンス劣化の原因 */</span></div>
+
+          <p>scale(0.95) が正しい理由：</p>
+          <ul style="margin:0 0 20px 20px; display:flex; flex-direction:column; gap:8px;">
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>触覚的フィードバック</strong> — 「物理的に押し込む」感覚を視覚で補完する。</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>全体が縮む</strong> — opacity と異なり、形状が変わる。よりリアルな「押した」感。</li>
+            <li style="font-size:17px; letter-spacing:-0.374px;"><strong>GPU合成レイヤー</strong> — transform はGPUで処理されるため、再描画が発生せずパフォーマンスが高い。</li>
+          </ul>
+        </section>
+
+        <section id="scroll" class="prose">
+          <h2>スクロールアニメーション</h2>
+          <p>apple.comのスクロール演出は主に<strong>フェードイン + 上昇（translateY）</strong>の組み合わせだ。</p>
+
+          <div class="scroll-reveal-demo">
+            <div class="reveal-before">
+              <div class="reveal-box" style="opacity:0; transform:translateY(20px);"></div>
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">スクロール前（画面外）</div>
+                <span class="reveal-badge reveal-badge--before">opacity: 0 · translateY(20px)</span>
+              </div>
+            </div>
+            <div class="reveal-after">
+              <div class="reveal-box"></div>
+              <div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-ink); margin-bottom:4px;">スクロール後（画面内）</div>
+                <span class="reveal-badge reveal-badge--after">opacity: 1 · translateY(0) · 500ms ease-out</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="code-block">
+<span class="c-comment">/* Intersection Observer でスクロール検出 */</span>
+<span class="c-sel">.reveal</span> {
+  <span class="c-prop">opacity</span>: <span class="c-num">0</span>;
+  <span class="c-prop">transform</span>: <span class="c-fn">translateY</span>(<span class="c-num">20px</span>);
+  <span class="c-prop">transition</span>:
+    <span class="c-val">opacity</span> <span class="c-num">0.5s</span> <span class="c-fn">cubic-bezier</span>(<span class="c-num">0.25</span>, <span class="c-num">0.46</span>, <span class="c-num">0.45</span>, <span class="c-num">0.94</span>),
+    <span class="c-val">transform</span> <span class="c-num">0.5s</span> <span class="c-fn">cubic-bezier</span>(<span class="c-num">0.25</span>, <span class="c-num">0.46</span>, <span class="c-num">0.45</span>, <span class="c-num">0.94</span>);
+}
+<span class="c-sel">.reveal.is-visible</span> {
+  <span class="c-prop">opacity</span>: <span class="c-num">1</span>;
+  <span class="c-prop">transform</span>: <span class="c-fn">translateY</span>(<span class="c-num">0</span>);
+}</div>
+
+          <p><strong>translateY(20px)</strong> という値が重要だ。大きすぎると「飛び込んでくる」印象になり主張しすぎる。20〜24pxが「あったかどうかわからない」絶妙な値だ。</p>
+        </section>
+
+        <section id="reduced" class="prose">
+          <h2>Reduced Motion — アクセシビリティ対応</h2>
+          <p>前庭障害や光過敏症を持つユーザーにとって、アニメーションは身体的に辛い体験になることがある。Appleはこれを深刻に扱う。</p>
+          <p>OSの「視差効果を減らす」設定がオンのとき、<span class="token-name">prefers-reduced-motion: reduce</span> メディアクエリが発動する。</p>
+
+          <div class="code-block">
+<span class="c-comment">/* Reduced Motion 対応 — 必須実装 */</span>
+<span class="c-sel">@media (prefers-reduced-motion: reduce)</span> {
+  <span class="c-sel">*, *::before, *::after</span> {
+    <span class="c-prop">animation-duration</span>: <span class="c-num">0.01ms</span> <span class="c-val">!important</span>;
+    <span class="c-prop">animation-iteration-count</span>: <span class="c-num">1</span> <span class="c-val">!important</span>;
+    <span class="c-prop">transition-duration</span>: <span class="c-num">0.01ms</span> <span class="c-val">!important</span>;
+  }
+
+  <span class="c-comment">/* スクロールrevealは即座に表示 */</span>
+  <span class="c-sel">.reveal</span> {
+    <span class="c-prop">opacity</span>: <span class="c-num">1</span>;
+    <span class="c-prop">transform</span>: <span class="c-fn">none</span>;
+  }
+}</div>
+
+          <div class="callout">
+            <p class="callout__label">必須チェックリスト</p>
+            <p>あらゆるアニメーション実装の最後に <span class="token-name">prefers-reduced-motion</span> ブロックを追加する。これを省略することは、一部のユーザーを排除することだ。</p>
+          </div>
+        </section>
+
+        <section id="exercise">
+          <div class="exercise">
+            <span class="exercise__badge">演習</span>
+            <h2 class="exercise__title">モーション実装と監査</h2>
+            <p class="exercise__desc">以下のアニメーションをCSSで実装し、Reduced Motion対応まで完成させてください。</p>
+            <ol class="exercise__steps">
+              <li>button-primary の :active に scale(0.95) を 150ms ease-out で実装する。スマホの実機でタップして確認する。</li>
+              <li>3つの要素にスクロール出現アニメーション（opacity + translateY(20px)、500ms ease-out）を Intersection Observer で実装する。</li>
+              <li>@media (prefers-reduced-motion: reduce) ブロックを追加し、全アニメーションをオフにする。MacのシステムPref→アクセシビリティで「視差効果を減らす」をオンにして動作確認する。</li>
+              <li>ease-out と linear を同じデュレーションで実装し、並べて比較する動画を録画してコミュニティに投稿する。</li>
+              <li>「このモジュールを学ぶ前に使っていたイージング値」と「今後使う値」を1行ずつ書く。</li>
+            </ol>
+          </div>
+        </section>
+
+        <nav class="module-nav">
+          <a class="module-nav__btn" href="module-08.html">← Module 08</a>
+          <span class="module-nav__center">Module 09 / 12</span>
+          <a class="module-nav__btn" href="module-10.html">Module 10 →</a>
+        </nav>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

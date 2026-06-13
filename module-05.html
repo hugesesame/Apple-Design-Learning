@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 05 — コンポーネント設計 | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-primary: #0066cc; --color-primary-focus: #0071e3; --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff; --color-canvas-parchment: #f5f5f7; --color-surface-pearl: #fafafc;
+      --color-surface-tile-1: #272729; --color-surface-black: #000000;
+      --color-ink: #1d1d1f; --color-body-on-dark: #ffffff; --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333; --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0; --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px; --rounded-md: 11px; --rounded-lg: 18px; --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); background: var(--color-canvas); -webkit-font-smoothing: antialiased; }
+
+    .global-nav { position: sticky; top: 0; z-index: 100; height: 44px; background: var(--color-surface-black); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .global-nav__logo { font-size: 21px; font-weight: 600; color: #fff; letter-spacing: 0.231px; text-decoration: none; }
+    .global-nav__links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .global-nav__links a { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: -0.12px; text-decoration: none; }
+    .global-nav__links a:hover { color: #fff; }
+    .sub-nav { position: sticky; top: 44px; z-index: 99; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .sub-nav__breadcrumb { display: flex; align-items: center; gap: 6px; }
+    .sub-nav__breadcrumb a { font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .sub-nav__breadcrumb span { font-size: 14px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+    .sub-nav__progress { display: flex; align-items: center; gap: 12px; }
+    .progress-label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .progress-bar { width: 80px; height: 4px; background: var(--color-hairline); border-radius: var(--rounded-pill); overflow: hidden; }
+    .progress-bar__fill { height: 100%; width: 41.67%; background: var(--color-primary); border-radius: var(--rounded-pill); }
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 96px); max-width: 1280px; margin: 0 auto; }
+    .sidebar { position: sticky; top: 96px; height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--color-hairline); padding: 32px 0; background: var(--color-canvas); }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+    .sidebar__nav { list-style: none; margin-bottom: 32px; }
+    .sidebar__nav li a { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 14px; font-weight: 400; color: var(--color-ink-muted-48); letter-spacing: -0.224px; text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active { color: var(--color-primary); font-weight: 600; background: rgba(0,102,204,0.06); }
+    .sidebar__nav li a .nav-num { font-size: 11px; color: var(--color-ink-muted-48); min-width: 20px; }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-hairline); margin-left: auto; flex-shrink: 0; }
+    .sidebar__nav li a.done .nav-check { background: var(--color-primary); border-color: var(--color-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+    .article { padding: 64px 72px 120px; max-width: 760px; }
+    .article__eyebrow { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .article__title { font-size: 40px; font-weight: 600; line-height: 1.10; letter-spacing: 0; color: var(--color-ink); margin-bottom: 16px; }
+    .article__lead { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-ink-muted-48); margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--color-hairline); }
+    .prose h2 { font-size: 28px; font-weight: 600; line-height: 1.14; letter-spacing: 0.196px; color: var(--color-ink); margin: 56px 0 16px; }
+    .prose h3 { font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; color: var(--color-ink); margin: 40px 0 12px; }
+    .prose p { font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); margin-bottom: 20px; }
+    .prose strong { font-weight: 600; }
+    .callout { background: var(--color-canvas-parchment); border-left: 3px solid var(--color-primary); border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0; padding: 20px 24px; margin: 32px 0; }
+    .callout__label { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout p { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin: 0; }
+    .callout .callout__label { color: var(--color-primary); }
+    .key-point { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; text-align: center; }
+    .key-point__quote { font-size: 24px; font-weight: 300; line-height: 1.5; margin-bottom: 16px; }
+    .key-point__attr { font-size: 14px; font-weight: 400; letter-spacing: -0.224px; }
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .token-name { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); }
+    .exercise { background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; }
+    .exercise__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-primary); background: rgba(0,102,204,0.1); padding: 4px 12px; border-radius: var(--rounded-pill); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+    .exercise__title { font-size: 21px; font-weight: 600; color: var(--color-ink); letter-spacing: 0.231px; margin-bottom: 12px; }
+    .exercise__desc { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin-bottom: 20px; }
+    .exercise__steps { list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+    .exercise__steps li { display: flex; gap: 12px; font-size: 14px; color: var(--color-ink); line-height: 1.43; letter-spacing: -0.224px; counter-increment: step; }
+    .exercise__steps li::before { content: counter(step); width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0 0; border-top: 1px solid var(--color-hairline); margin-top: 80px; }
+    .module-nav__btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__center { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+
+    /* ── Component anatomy table ────────────────── */
+    .comp-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .comp-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .comp-table td { padding: 10px 12px; font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: top; }
+    .comp-table tr:last-child td { border-bottom: none; }
+    .comp-table tr:hover td { background: var(--color-canvas-parchment); }
+
+    /* ── Button showcase ────────────────────────── */
+    .btn-showcase { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--color-hairline); border-radius: var(--rounded-lg); overflow: hidden; margin: 24px 0; }
+    .btn-row { display: grid; grid-template-columns: 1fr 160px 180px; align-items: center; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--color-divider-soft); }
+    .btn-row:last-child { border-bottom: none; }
+    .btn-row--dark { background: var(--color-surface-tile-1); }
+    .btn-row__name { font-size: 13px; font-weight: 600; color: var(--color-ink); letter-spacing: -0.224px; }
+    .btn-row--dark .btn-row__name { color: var(--color-body-on-dark); }
+    .btn-row__spec { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: var(--color-ink-muted-48); line-height: 1.6; }
+    .btn-row--dark .btn-row__spec { color: var(--color-body-muted); }
+
+    /* Real button renderings */
+    .b-primary { display: inline-flex; align-items: center; padding: 11px 22px; border-radius: 9999px; background: #0066cc; color: #fff; font-size: 17px; font-weight: 400; letter-spacing: -0.374px; border: none; cursor: default; transition: transform 0.1s; }
+    .b-secondary { display: inline-flex; align-items: center; padding: 10px 22px; border-radius: 9999px; background: transparent; color: #0066cc; font-size: 17px; font-weight: 400; letter-spacing: -0.374px; border: 1px solid #0066cc; cursor: default; }
+    .b-dark-utility { display: inline-flex; align-items: center; padding: 8px 15px; border-radius: 8px; background: #1d1d1f; color: #fff; font-size: 14px; font-weight: 400; letter-spacing: -0.224px; border: none; cursor: default; }
+    .b-pearl { display: inline-flex; align-items: center; padding: 8px 14px; border-radius: 11px; background: #fafafc; color: #333; font-size: 14px; font-weight: 400; letter-spacing: -0.224px; border: 3px solid rgba(0,0,0,0.04); cursor: default; }
+    .b-store-hero { display: inline-flex; align-items: center; padding: 14px 28px; border-radius: 9999px; background: #0066cc; color: #fff; font-size: 18px; font-weight: 300; letter-spacing: 0; border: none; cursor: default; }
+    .b-icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(210,210,215,0.64); border: none; cursor: default; }
+
+    /* ── Radius scale ───────────────────────────── */
+    .radius-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+    .radius-card { border: 1px solid var(--color-hairline); padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; background: var(--color-canvas-parchment); }
+    .radius-box { width: 64px; height: 40px; background: var(--color-primary); opacity: 0.15; border: 2px solid var(--color-primary); }
+    .radius-card__token { font-family: monospace; font-size: 11px; color: var(--color-primary); }
+    .radius-card__value { font-size: 12px; color: var(--color-ink-muted-48); }
+
+    /* ── Tile anatomy ───────────────────────────── */
+    .tile-anatomy { border: 1px solid var(--color-hairline); border-radius: var(--rounded-lg); overflow: hidden; margin: 24px 0; }
+    .tile-anatomy__zone { padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed rgba(0,102,204,0.2); }
+    .tile-anatomy__zone:last-child { border-bottom: none; }
+    .tile-anatomy__label { font-size: 13px; font-weight: 600; color: var(--color-ink); }
+    .tile-anatomy__spec { font-family: monospace; font-size: 11px; color: var(--color-primary); }
+
+    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .article { padding: 40px 24px 80px; } .radius-grid { grid-template-columns: repeat(2,1fr); } .btn-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a><span>›</span><span>Module 05</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">5 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 05</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro"    class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#anatomy" ><span class="nav-num">2.</span> コンポーネントの解剖学<div class="nav-check"></div></a></li>
+        <li><a href="#nav"     ><span class="nav-num">3.</span> ナビゲーション<div class="nav-check"></div></a></li>
+        <li><a href="#buttons" ><span class="nav-num">4.</span> ボタン体系<div class="nav-check"></div></a></li>
+        <li><a href="#radius"  ><span class="nav-num">5.</span> 形状とボーダーラジウス<div class="nav-check"></div></a></li>
+        <li><a href="#tiles"   ><span class="nav-num">6.</span> タイルとカード<div class="nav-check"></div></a></li>
+        <li><a href="#inputs"  ><span class="nav-num">7.</span> インプットとフォーム<div class="nav-check"></div></a></li>
+        <li><a href="#exercise"><span class="nav-num">8.</span> 演習<div class="nav-check"></div></a></li>
+      </ul>
+      <p class="sidebar__section-label">モジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-04.html" class="done"><span class="nav-num">04.</span> スペーシング<div class="nav-check"></div></a></li>
+        <li><a href="module-05.html" class="active"><span class="nav-num">05.</span> コンポーネント<div class="nav-check"></div></a></li>
+        <li><a href="module-06.html"><span class="nav-num">06.</span> エレベーション<div class="nav-check"></div></a></li>
+        <li><a href="module-07.html"><span class="nav-num">07.</span> レスポンシブ<div class="nav-check"></div></a></li>
+        <li><a href="module-08.html"><span class="nav-num">08.</span> トークン実装<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <article class="article">
+        <p class="article__eyebrow">Module 05 · コンポーネント</p>
+        <h1 class="article__title">コンポーネント設計</h1>
+        <p class="article__lead">Appleのコンポーネントはすべて「役割が1つ」だ。ナビゲーションはナビゲーション、ボタンはボタン。役割を越えない設計が、システム全体の一貫性を保つ。</p>
+
+        <section id="intro" class="prose">
+          <h2>このモジュールで学ぶこと</h2>
+          <p>design.mdに定義されているAppleのコンポーネントは15種以上ある。しかしそれを「覚える」のがこのモジュールの目的ではない。各コンポーネントの<strong>構造・トークン参照・状態</strong>を読み解く力を養うことが目的だ。</p>
+          <p>Appleのコンポーネントドキュメントの特徴は「Default と Active/Pressed 状態のみ記録する」ことだ。Hover状態は記録しない。なぜなら、ホバーはモバイルに存在しないインタラクションだからだ。</p>
+          <div class="callout">
+            <p class="callout__label">このモジュールの目標</p>
+            <p>任意のコンポーネントを見たとき、「どのトークンで構成されているか」「どの状態があるか」を素早く分解できるようになること。</p>
+          </div>
+        </section>
+
+        <section id="anatomy" class="prose">
+          <h2>コンポーネントの解剖学</h2>
+          <p>すべてのコンポーネントは以下の4層で記述できる。この枠組みを使うと、Appleのどのコンポーネントも同じ方法で分析できる。</p>
+          <table class="comp-table">
+            <thead><tr><th>層</th><th>内容</th><th>例（button-primary）</th></tr></thead>
+            <tbody>
+              <tr><td><strong>サーフェス</strong></td><td>背景色・形状・サイズ</td><td>bg: {colors.primary} · rounded: {rounded.pill} · padding: 11px×22px</td></tr>
+              <tr><td><strong>コンテンツ</strong></td><td>テキスト・アイコンのトークン</td><td>color: white · {typography.body} (17px/400)</td></tr>
+              <tr><td><strong>ボーダー</strong></td><td>線・アウトライン</td><td>通常: なし · focus: 2px solid {colors.primary-focus}</td></tr>
+              <tr><td><strong>状態</strong></td><td>Default / Active のみ</td><td>active: transform scale(0.95)</td></tr>
+            </tbody>
+          </table>
+
+          <div class="key-point">
+            <p class="key-point__quote">Hover 状態はドキュメントしない。<br>Default と Active だけが、Appleのコンポーネント記録の原則だ。</p>
+            <p class="key-point__attr">design.md Iteration Guide より</p>
+          </div>
+        </section>
+
+        <section id="nav" class="prose">
+          <h2>ナビゲーション</h2>
+          <h3>Global Nav — 44px の黒いバー</h3>
+          <p><span class="token-name">{component.global-nav}</span> はすべてのページに固定表示される超薄型ナビバーだ。</p>
+          <div class="tile-anatomy">
+            <div class="tile-anatomy__zone" style="background:#000; border-bottom:1px dashed rgba(255,255,255,0.1);">
+              <span class="tile-anatomy__label" style="color:#fff;">Global Nav</span>
+              <span class="tile-anatomy__spec">bg: #000000 · height: 44px · font: 12px/400/-0.12px</span>
+            </div>
+          </div>
+          <table class="comp-table">
+            <thead><tr><th>要素</th><th>トークン</th></tr></thead>
+            <tbody>
+              <tr><td>背景</td><td><span class="token-name">{colors.surface-black}</span> #000000</td></tr>
+              <tr><td>高さ</td><td>44px（固定）</td></tr>
+              <tr><td>リンクテキスト</td><td><span class="token-name">{typography.nav-link}</span> 12px/400/-0.12px · 色: rgba(255,255,255,0.8)</td></tr>
+              <tr><td>ロゴ</td><td><span class="token-name">{typography.tagline}</span> 21px/600</td></tr>
+              <tr><td>右クラスタ</td><td>Search・Bagアイコン（<span class="token-name">{component.button-dark-utility}</span>）</td></tr>
+              <tr><td>モバイル折り畳み</td><td>834px以下でハンバーガー化</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Sub Nav Frosted — 52px の半透明バー</h3>
+          <p><span class="token-name">{component.sub-nav-frosted}</span> はページ固有のナビ。Frosted Glassエフェクトが特徴だ。</p>
+          <table class="comp-table">
+            <thead><tr><th>要素</th><th>トークン</th></tr></thead>
+            <tbody>
+              <tr><td>背景</td><td><span class="token-name">{colors.canvas-parchment}</span> @ 80% opacity + backdrop-filter: saturate(180%) blur(20px)</td></tr>
+              <tr><td>高さ</td><td>52px</td></tr>
+              <tr><td>左: カテゴリ名</td><td><span class="token-name">{typography.tagline}</span> 21px/600</td></tr>
+              <tr><td>右: インラインリンク</td><td><span class="token-name">{typography.button-utility}</span> 14px/400</td></tr>
+              <tr><td>右端CTA</td><td><span class="token-name">{component.button-primary}</span>（常時表示）</td></tr>
+              <tr><td>下境界</td><td>1px solid rgba(0,0,0,0.08)（hairline）</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="buttons" class="prose">
+          <h2>ボタン体系</h2>
+          <p>Appleのボタンは6種類ある。それぞれ<strong>使用場面が明確に分かれており、混用しない</strong>。形状（radius）がボタンの「文法」を決定する。</p>
+
+          <div class="btn-showcase">
+            <div class="btn-row">
+              <div>
+                <div class="btn-row__name">button-primary</div>
+                <div class="btn-row__spec">bg: #0066cc · color: white<br>font: 17px/400/-0.374px<br>padding: 11×22px · radius: pill<br>active: scale(0.95)</div>
+              </div>
+              <span class="b-primary">詳しく見る</span>
+              <span style="font-size:12px; color:var(--color-ink-muted-48);">メインCTA。全ページ共通のアクションシグナル。</span>
+            </div>
+            <div class="btn-row">
+              <div>
+                <div class="btn-row__name">button-secondary-pill</div>
+                <div class="btn-row__spec">bg: transparent · color: #0066cc<br>border: 1px solid #0066cc<br>font: 17px/400 · radius: pill</div>
+              </div>
+              <span class="b-secondary">購入する</span>
+              <span style="font-size:12px; color:var(--color-ink-muted-48);">Primary と並置する第2CTA。ゴーストピル。</span>
+            </div>
+            <div class="btn-row btn-row--dark">
+              <div>
+                <div class="btn-row__name">button-dark-utility</div>
+                <div class="btn-row__spec">bg: #1d1d1f · color: white<br>font: 14px/400/-0.224px<br>padding: 8×15px · radius: 8px</div>
+              </div>
+              <span class="b-dark-utility">Sign In</span>
+              <span style="font-size:12px; color:var(--color-body-muted);">グローバルナビ専用ユーティリティアクション。</span>
+            </div>
+            <div class="btn-row">
+              <div>
+                <div class="btn-row__name">button-pearl-capsule</div>
+                <div class="btn-row__spec">bg: #fafafc · color: #333<br>border: 3px solid rgba(0,0,0,0.04)<br>font: 14px/400 · radius: 11px</div>
+              </div>
+              <span class="b-pearl">Learn more</span>
+              <span style="font-size:12px; color:var(--color-ink-muted-48);">製品カードのセカンダリリンク。</span>
+            </div>
+            <div class="btn-row">
+              <div>
+                <div class="btn-row__name">button-store-hero</div>
+                <div class="btn-row__spec">bg: #0066cc · color: white<br>font: 18px/<strong>300</strong>/0<br>padding: 14×28px · radius: pill</div>
+              </div>
+              <span class="b-store-hero">購入する</span>
+              <span style="font-size:12px; color:var(--color-ink-muted-48);">ストアヒーロー限定。weight 300の稀な使用例。</span>
+            </div>
+            <div class="btn-row btn-row--dark">
+              <div>
+                <div class="btn-row__name">button-icon-circular</div>
+                <div class="btn-row__spec">44×44px · radius: 50%<br>bg: rgba(210,210,215,0.64)<br>（Translucent Chip）</div>
+              </div>
+              <span class="b-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </span>
+              <span style="font-size:12px; color:var(--color-body-muted);">写真の上に浮かぶカルーセルコントロール等。</span>
+            </div>
+          </div>
+
+          <div class="callout">
+            <p class="callout__label">ボタン文法の要点</p>
+            <p>ピル（9999px）= アクション。角丸スモール（8px）= ユーティリティ。角丸ミディアム（11px）= カード内セカンダリ。この3文法を混ぜない。</p>
+          </div>
+        </section>
+
+        <section id="radius" class="prose">
+          <h2>形状とボーダーラジウス</h2>
+          <p>Appleのボーダーラジウスは<strong>役割と対応している</strong>。「なんとなく角丸」ではなく、値ごとに使用場面が決まっている。</p>
+
+          <div class="radius-grid">
+            <div class="radius-card">
+              <div class="radius-box" style="border-radius:0;"></div>
+              <span class="radius-card__token">{rounded.none}</span>
+              <span class="radius-card__value">0px</span>
+              <span style="font-size:12px;color:var(--color-ink-muted-48);text-align:center;">全面タイル。タイルは角丸なし。</span>
+            </div>
+            <div class="radius-card">
+              <div class="radius-box" style="border-radius:8px;"></div>
+              <span class="radius-card__token">{rounded.sm}</span>
+              <span class="radius-card__value">8px</span>
+              <span style="font-size:12px;color:var(--color-ink-muted-48);text-align:center;">ユーティリティボタン・インライン画像</span>
+            </div>
+            <div class="radius-card">
+              <div class="radius-box" style="border-radius:11px;"></div>
+              <span class="radius-card__token">{rounded.md}</span>
+              <span class="radius-card__value">11px</span>
+              <span style="font-size:12px;color:var(--color-ink-muted-48);text-align:center;">Pearl Buttonカプセル</span>
+            </div>
+            <div class="radius-card">
+              <div class="radius-box" style="border-radius:18px;"></div>
+              <span class="radius-card__token">{rounded.lg}</span>
+              <span class="radius-card__value">18px</span>
+              <span style="font-size:12px;color:var(--color-ink-muted-48);text-align:center;">ストア・アクセサリカード</span>
+            </div>
+            <div class="radius-card">
+              <div class="radius-box" style="border-radius:9999px;"></div>
+              <span class="radius-card__token">{rounded.pill}</span>
+              <span class="radius-card__value">9999px</span>
+              <span style="font-size:12px;color:var(--color-ink-muted-48);text-align:center;">CTAピル・検索・チップ。アクションの文法。</span>
+            </div>
+            <div class="radius-card">
+              <div class="radius-box" style="border-radius:50%; width:40px; height:40px;"></div>
+              <span class="radius-card__token">{rounded.full}</span>
+              <span class="radius-card__value">50%</span>
+              <span style="font-size:12px;color:var(--color-ink-muted-48);text-align:center;">写真上の円形コントロールチップ</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="tiles" class="prose">
+          <h2>タイルとカード</h2>
+          <h3>製品タイル — ページの基本単位</h3>
+          <p>製品タイルはapple.comの最重要コンポーネントだ。ライト・パーチメント・ダークの3バリアントがあり、交互に積まれてページリズムを作る。</p>
+
+          <div class="tile-anatomy">
+            <div class="tile-anatomy__zone" style="background:rgba(0,102,204,0.04);">
+              <span class="tile-anatomy__label">① 垂直パディング top</span>
+              <span class="tile-anatomy__spec">{spacing.section} = 80px</span>
+            </div>
+            <div class="tile-anatomy__zone">
+              <span class="tile-anatomy__label">② 製品名</span>
+              <span class="tile-anatomy__spec">{typography.display-lg} 40px/600/lh1.10</span>
+            </div>
+            <div class="tile-anatomy__zone">
+              <span class="tile-anatomy__label">③ タグライン</span>
+              <span class="tile-anatomy__spec">{typography.lead} 28px/400/lh1.14/+0.196px</span>
+            </div>
+            <div class="tile-anatomy__zone">
+              <span class="tile-anatomy__label">④ 2つのCTA</span>
+              <span class="tile-anatomy__spec">button-primary + button-secondary-pill · gap: 20px</span>
+            </div>
+            <div class="tile-anatomy__zone">
+              <span class="tile-anatomy__label">⑤ 製品ビジュアル</span>
+              <span class="tile-anatomy__spec">写真/PNG · shadow-product のみ · min-margin-top: 40px</span>
+            </div>
+            <div class="tile-anatomy__zone" style="background:rgba(0,102,204,0.04);">
+              <span class="tile-anatomy__label">⑥ 垂直パディング bottom</span>
+              <span class="tile-anatomy__spec">{spacing.section} = 80px</span>
+            </div>
+          </div>
+
+          <h3>Store Utility Card</h3>
+          <p><span class="token-name">{component.store-utility-card}</span> はストアとアクセサリグリッドで使われる汎用カードだ。</p>
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:24px 0;">
+            <div style="background:#fff; border:1px solid #e0e0e0; border-radius:18px; padding:20px; display:flex; flex-direction:column; gap:8px;">
+              <div style="width:100%; aspect-ratio:1; background:#f5f5f7; border-radius:8px;"></div>
+              <div style="font-size:14px; font-weight:600; color:#1d1d1f; letter-spacing:-0.224px;">AirPods Pro</div>
+              <div style="font-size:14px; color:#1d1d1f;">¥39,800</div>
+              <span style="font-size:14px; color:#0066cc; letter-spacing:-0.224px;">詳しく見る</span>
+            </div>
+            <div style="background:#fff; border:1px solid #e0e0e0; border-radius:18px; padding:20px; display:flex; flex-direction:column; gap:8px;">
+              <div style="width:100%; aspect-ratio:1; background:#f5f5f7; border-radius:8px;"></div>
+              <div style="font-size:14px; font-weight:600; color:#1d1d1f; letter-spacing:-0.224px;">Apple Watch</div>
+              <div style="font-size:14px; color:#1d1d1f;">¥59,800</div>
+              <span style="font-size:14px; color:#0066cc; letter-spacing:-0.224px;">詳しく見る</span>
+            </div>
+            <div style="background:#fff; border:1px solid #e0e0e0; border-radius:18px; padding:20px; display:flex; flex-direction:column; gap:8px;">
+              <div style="width:100%; aspect-ratio:1; background:#f5f5f7; border-radius:8px;"></div>
+              <div style="font-size:14px; font-weight:600; color:#1d1d1f; letter-spacing:-0.224px;">MagSafe</div>
+              <div style="font-size:14px; color:#1d1d1f;">¥7,800</div>
+              <span style="font-size:14px; color:#0066cc; letter-spacing:-0.224px;">詳しく見る</span>
+            </div>
+          </div>
+          <p style="font-size:13px; color:var(--color-ink-muted-48); text-align:center; margin-top:-8px;">bg: white · border: 1px #e0e0e0 · radius: 18px · padding: 24px · 内部画像radius: 8px</p>
+        </section>
+
+        <section id="inputs" class="prose">
+          <h2>インプットとフォーム</h2>
+          <p>Appleが分析されたページ上でドキュメントしているインプットは<strong>検索フィールドのみ</strong>だ。バリデーションやエラー状態は記録されていない。</p>
+
+          <div style="padding:24px; background:var(--color-canvas-parchment); border-radius:var(--rounded-lg); margin:24px 0;">
+            <div style="display:flex; align-items:center; gap:8px; padding:12px 20px; border-radius:9999px; background:#fff; border:1px solid rgba(0,0,0,0.08); max-width:400px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7a7a7a" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <span style="font-size:17px; color:#7a7a7a; letter-spacing:-0.374px;">検索</span>
+            </div>
+            <p style="font-size:12px; color:var(--color-ink-muted-48); margin-top:12px;">bg: white · border: 1px rgba(0,0,0,0.08) · radius: pill · padding: 12×20px · height: 44px</p>
+          </div>
+
+          <div class="callout">
+            <p class="callout__label">注意点</p>
+            <p>検索インプットも <span class="token-name">{rounded.pill}</span> を使う。ピル形状はCTAだけでなく「入力フィールドがアクティブなUI要素であること」を示す文法として使われる。</p>
+          </div>
+        </section>
+
+        <section id="exercise">
+          <div class="exercise">
+            <span class="exercise__badge">演習</span>
+            <h2 class="exercise__title">コンポーネントを分解してドキュメントする</h2>
+            <p class="exercise__desc">apple.comを開き、任意のページから3つのコンポーネントを選んで、「4層の解剖学フレーム（サーフェス・コンテンツ・ボーダー・状態）」でドキュメントしてください。</p>
+            <ol class="exercise__steps">
+              <li>デベロッパーツールで対象コンポーネントのCSSを確認し、background・border-radius・font-size・colorを記録する。</li>
+              <li>design.mdのトークン定義と照合し、どのトークン名に対応するかを特定する（例: border-radius: 18px → {rounded.lg}）。</li>
+              <li>Active/Press状態をトリガーし（スマホで実際に長押しするか、DevToolsでactive擬似クラスを適用）、変化を記録する。</li>
+              <li>Figmaで同じコンポーネントをゼロから再現する。正確なトークン値を使い、Auto-layoutで構成する。</li>
+              <li>「なぜこのradiusが選ばれたのか」を1文で説明してコミュニティに投稿する。</li>
+            </ol>
+          </div>
+        </section>
+
+        <nav class="module-nav">
+          <a class="module-nav__btn" href="module-04.html">← Module 04</a>
+          <span class="module-nav__center">Module 05 / 12</span>
+          <a class="module-nav__btn" href="module-06.html">Module 06 →</a>
+        </nav>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

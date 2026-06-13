@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 08 — デザイントークン実装 | Apple Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-primary: #0066cc; --color-primary-focus: #0071e3; --color-primary-on-dark: #2997ff;
+      --color-canvas: #ffffff; --color-canvas-parchment: #f5f5f7; --color-surface-pearl: #fafafc;
+      --color-surface-tile-1: #272729; --color-surface-black: #000000;
+      --color-ink: #1d1d1f; --color-body-on-dark: #ffffff; --color-body-muted: #cccccc;
+      --color-ink-muted-80: #333333; --color-ink-muted-48: #7a7a7a;
+      --color-hairline: #e0e0e0; --color-divider-soft: #f0f0f0;
+      --rounded-sm: 8px; --rounded-md: 11px; --rounded-lg: 18px; --rounded-pill: 9999px;
+      --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); background: var(--color-canvas); -webkit-font-smoothing: antialiased; }
+    .global-nav { position: sticky; top: 0; z-index: 100; height: 44px; background: var(--color-surface-black); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .global-nav__logo { font-size: 21px; font-weight: 600; color: #fff; letter-spacing: 0.231px; text-decoration: none; }
+    .global-nav__links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .global-nav__links a { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: -0.12px; text-decoration: none; }
+    .global-nav__links a:hover { color: #fff; }
+    .sub-nav { position: sticky; top: 44px; z-index: 99; height: 52px; background: rgba(245,245,247,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .sub-nav__breadcrumb { display: flex; align-items: center; gap: 6px; }
+    .sub-nav__breadcrumb a { font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .sub-nav__breadcrumb span { font-size: 14px; color: var(--color-ink-muted-48); letter-spacing: -0.224px; }
+    .sub-nav__progress { display: flex; align-items: center; gap: 12px; }
+    .progress-label { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+    .progress-bar { width: 80px; height: 4px; background: var(--color-hairline); border-radius: var(--rounded-pill); overflow: hidden; }
+    .progress-bar__fill { height: 100%; width: 66.67%; background: var(--color-primary); border-radius: var(--rounded-pill); }
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 96px); max-width: 1280px; margin: 0 auto; }
+    .sidebar { position: sticky; top: 96px; height: calc(100vh - 96px); overflow-y: auto; border-right: 1px solid var(--color-hairline); padding: 32px 0; background: var(--color-canvas); }
+    .sidebar::-webkit-scrollbar { width: 0; }
+    .sidebar__section-label { font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+    .sidebar__nav { list-style: none; margin-bottom: 32px; }
+    .sidebar__nav li a { display: flex; align-items: center; gap: 10px; padding: 8px 20px; font-size: 14px; font-weight: 400; color: var(--color-ink-muted-48); letter-spacing: -0.224px; text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .sidebar__nav li a:hover { color: var(--color-ink); background: var(--color-canvas-parchment); }
+    .sidebar__nav li a.active { color: var(--color-primary); font-weight: 600; background: rgba(0,102,204,0.06); }
+    .sidebar__nav li a .nav-num { font-size: 11px; color: var(--color-ink-muted-48); min-width: 20px; }
+    .sidebar__nav li a.active .nav-num { color: var(--color-primary); }
+    .sidebar__nav li a .nav-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-hairline); margin-left: auto; flex-shrink: 0; }
+    .sidebar__nav li a.done .nav-check { background: var(--color-primary); border-color: var(--color-primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+    .article { padding: 64px 72px 120px; max-width: 760px; }
+    .article__eyebrow { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .article__title { font-size: 40px; font-weight: 600; line-height: 1.10; letter-spacing: 0; color: var(--color-ink); margin-bottom: 16px; }
+    .article__lead { font-size: 24px; font-weight: 300; line-height: 1.5; color: var(--color-ink-muted-48); margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--color-hairline); }
+    .prose h2 { font-size: 28px; font-weight: 600; line-height: 1.14; letter-spacing: 0.196px; color: var(--color-ink); margin: 56px 0 16px; }
+    .prose h3 { font-size: 21px; font-weight: 600; line-height: 1.19; letter-spacing: 0.231px; color: var(--color-ink); margin: 40px 0 12px; }
+    .prose p { font-size: 17px; font-weight: 400; line-height: 1.47; letter-spacing: -0.374px; color: var(--color-ink); margin-bottom: 20px; }
+    .prose strong { font-weight: 600; }
+    .callout { background: var(--color-canvas-parchment); border-left: 3px solid var(--color-primary); border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0; padding: 20px 24px; margin: 32px 0; }
+    .callout__label { font-size: 12px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout p { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin: 0; }
+    .callout .callout__label { color: var(--color-primary); }
+    .key-point { background: var(--color-surface-tile-1); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; text-align: center; }
+    .key-point__quote { font-size: 24px; font-weight: 300; line-height: 1.5; margin-bottom: 16px; }
+    .key-point__attr { font-size: 14px; font-weight: 400; letter-spacing: -0.224px; }
+    .key-point .key-point__quote { color: var(--color-body-on-dark); }
+    .key-point .key-point__attr  { color: var(--color-body-muted); }
+    .token-name { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; background: var(--color-canvas-parchment); padding: 2px 6px; border-radius: 4px; color: var(--color-ink-muted-80); }
+    .exercise { background: var(--color-canvas-parchment); border-radius: var(--rounded-lg); padding: 32px; margin: 40px 0; }
+    .exercise__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-primary); background: rgba(0,102,204,0.1); padding: 4px 12px; border-radius: var(--rounded-pill); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 16px; }
+    .exercise__title { font-size: 21px; font-weight: 600; color: var(--color-ink); letter-spacing: 0.231px; margin-bottom: 12px; }
+    .exercise__desc { font-size: 17px; color: var(--color-ink); line-height: 1.47; letter-spacing: -0.374px; margin-bottom: 20px; }
+    .exercise__steps { list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: step; }
+    .exercise__steps li { display: flex; gap: 12px; font-size: 14px; color: var(--color-ink); line-height: 1.43; letter-spacing: -0.224px; counter-increment: step; }
+    .exercise__steps li::before { content: counter(step); width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0 0; border-top: 1px solid var(--color-hairline); margin-top: 80px; }
+    .module-nav__btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-primary); text-decoration: none; letter-spacing: -0.224px; }
+    .module-nav__btn:hover { opacity: 0.75; }
+    .module-nav__center { font-size: 12px; color: var(--color-ink-muted-48); letter-spacing: -0.12px; }
+
+    /* ── Code blocks ─────────────────────────── */
+    .code-block { background: var(--color-surface-tile-1); border-radius: var(--rounded-sm); padding: 20px 24px; margin: 20px 0; font-family: 'SF Mono','Fira Code',monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; }
+    .code-comment { color: #636366; }
+    .code-prop { color: #a8daff; }
+    .code-val { color: #ffa657; }
+    .code-sel { color: #79c0ff; }
+    .code-func { color: #d2a8ff; }
+    .code-str { color: #a5d6ff; }
+
+    /* ── Token tier diagram ─────────────────── */
+    .tier-diagram { display: flex; flex-direction: column; gap: 4px; margin: 32px 0; }
+    .tier { border-radius: var(--rounded-sm); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .tier--global { background: rgba(0,102,204,0.08); border: 1px solid rgba(0,102,204,0.2); }
+    .tier--alias  { background: rgba(0,102,204,0.12); border: 1px solid rgba(0,102,204,0.3); }
+    .tier--comp   { background: rgba(0,102,204,0.18); border: 1px solid rgba(0,102,204,0.4); }
+    .tier__label { font-size: 14px; font-weight: 600; color: var(--color-primary); letter-spacing: -0.224px; }
+    .tier__desc  { font-size: 12px; color: var(--color-ink-muted-48); }
+    .tier__example { font-family: monospace; font-size: 11px; color: var(--color-primary); }
+    .tier-arrow { text-align: center; font-size: 18px; color: var(--color-ink-muted-48); line-height: 1; }
+
+    /* ── Token table ───────────────────────── */
+    .token-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .token-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
+    .token-table td { padding: 10px 12px; font-size: 12px; color: var(--color-ink); letter-spacing: -0.12px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: top; font-family: monospace; }
+    .token-table td.desc { font-family: 'Inter', sans-serif; font-size: 13px; letter-spacing: -0.224px; }
+    .token-table tr:last-child td { border-bottom: none; }
+
+    /* ── Mode switcher demo ────────────────── */
+    .mode-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+    .mode-panel { border-radius: var(--rounded-lg); padding: 24px; }
+    .mode-panel--light { background: #fff; border: 1px solid #e0e0e0; }
+    .mode-panel--dark  { background: #1c1c1e; border: 1px solid #3a3a3c; }
+    .mode-panel__title { font-size: 17px; font-weight: 600; margin-bottom: 12px; }
+    .mode-panel--light .mode-panel__title { color: #1d1d1f; }
+    .mode-panel--dark  .mode-panel__title { color: #ffffff; }
+    .mode-panel__btn { display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 9999px; font-size: 14px; font-weight: 400; cursor: default; }
+    .mode-panel--light .mode-panel__btn { background: #0066cc; color: #fff; }
+    .mode-panel--dark  .mode-panel__btn { background: #2997ff; color: #fff; }
+    .mode-panel__sub   { font-size: 13px; margin-top: 8px; }
+    .mode-panel--light .mode-panel__sub { color: #7a7a7a; }
+    .mode-panel--dark  .mode-panel__sub { color: #aeaeb2; }
+
+    /* ── Naming convention grid ───────────────── */
+    .naming-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; margin: 24px 0; align-items: start; }
+    .naming-segment { font-family: monospace; font-size: 13px; color: var(--color-primary); background: rgba(0,102,204,0.08); padding: 4px 10px; border-radius: 4px; white-space: nowrap; }
+    .naming-desc { font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; line-height: 1.5; padding-top: 3px; }
+
+    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .article { padding: 40px 24px 80px; } .mode-demo { grid-template-columns: 1fr; } .naming-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="global-nav">
+    <a class="global-nav__logo" href="index.html">Apple Design</a>
+    <ul class="global-nav__links">
+    </ul>
+  </nav>
+  <div class="sub-nav">
+    <div class="sub-nav__breadcrumb">
+      <a href="index.html">Apple Design</a><span>›</span><span>Module 08</span>
+    </div>
+    <div class="sub-nav__progress">
+      <span class="progress-label">8 / 12</span>
+      <div class="progress-bar"><div class="progress-bar__fill"></div></div>
+    </div>
+  </div>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <p class="sidebar__section-label">Module 08</p>
+      <ul class="sidebar__nav">
+        <li><a href="#intro"    class="active"><span class="nav-num">1.</span> はじめに<div class="nav-check"></div></a></li>
+        <li><a href="#tiers"   ><span class="nav-num">2.</span> トークン3層構造<div class="nav-check"></div></a></li>
+        <li><a href="#naming"  ><span class="nav-num">3.</span> 命名規則<div class="nav-check"></div></a></li>
+        <li><a href="#css"     ><span class="nav-num">4.</span> CSS カスタムプロパティ<div class="nav-check"></div></a></li>
+        <li><a href="#figma"   ><span class="nav-num">5.</span> Figma Variables<div class="nav-check"></div></a></li>
+        <li><a href="#modes"   ><span class="nav-num">6.</span> ライト/ダークモード<div class="nav-check"></div></a></li>
+        <li><a href="#catalog" ><span class="nav-num">7.</span> トークンカタログ<div class="nav-check"></div></a></li>
+        <li><a href="#exercise"><span class="nav-num">8.</span> 演習<div class="nav-check"></div></a></li>
+      </ul>
+      <p class="sidebar__section-label">モジュール</p>
+      <ul class="sidebar__nav">
+        <li><a href="module-07.html" class="done"><span class="nav-num">07.</span> レスポンシブ<div class="nav-check"></div></a></li>
+        <li><a href="module-08.html" class="active"><span class="nav-num">08.</span> トークン実装<div class="nav-check"></div></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <article class="article">
+        <p class="article__eyebrow">Module 08 · トークン</p>
+        <h1 class="article__title">デザイントークン実装</h1>
+        <p class="article__lead">デザイントークンはデザインとコードの<strong>共通言語</strong>だ。design.mdのすべての値は実装可能なトークンとして設計されている——その実装方法を学ぶ。</p>
+
+        <section id="intro" class="prose">
+          <h2>なぜトークンが必要か</h2>
+          <p>デザイナーが「青」と言い、エンジニアが <span class="token-name">#0066cc</span> と書く。この2つが同じ意味を指しているとき、両者が「確認した」という記録はどこにも残らない。</p>
+          <p>デザイントークンはこの問題を解決する。<span class="token-name">{colors.primary}</span> という名前が「デザイナーが青と呼んでいるもの」「エンジニアが #0066cc と書くもの」「Figmaでblue-primaryと呼ぶもの」をすべて同一のものとして接続する。</p>
+
+          <div class="key-point">
+            <p class="key-point__quote">トークンは値ではなく<strong>意図</strong>に名前を付ける。<br>#0066cc に名前を付けるのではなく、<br>「プライマリアクションに使う青」に名前を付ける。</p>
+            <p class="key-point__attr">design.md Token Philosophy より</p>
+          </div>
+        </section>
+
+        <section id="tiers" class="prose">
+          <h2>トークン3層構造</h2>
+          <p>design.mdのトークンシステムは3層で構成される。この階層を理解せずにトークンを設計すると、必ず行き詰まる。</p>
+
+          <div class="tier-diagram">
+            <div class="tier tier--global">
+              <div>
+                <div class="tier__label">Tier 1 — Global Tokens（プリミティブ）</div>
+                <div class="tier__desc">設計システムで使える全ての生の値を定義する。意味を持たない。</div>
+              </div>
+              <div class="tier__example">blue-600: #0066cc<br>size-17: 17px</div>
+            </div>
+            <div class="tier-arrow">↓</div>
+            <div class="tier tier--alias">
+              <div>
+                <div class="tier__label">Tier 2 — Alias Tokens（セマンティック）</div>
+                <div class="tier__desc">意図・用途を名前として持つ。Global Tokenを参照する。</div>
+              </div>
+              <div class="tier__example">color-primary: {blue-600}<br>font-body: {size-17}</div>
+            </div>
+            <div class="tier-arrow">↓</div>
+            <div class="tier tier--comp">
+              <div>
+                <div class="tier__label">Tier 3 — Component Tokens（コンポーネント固有）</div>
+                <div class="tier__desc">コンポーネントの特定のパーツに対してAlias Tokenを参照する。</div>
+              </div>
+              <div class="tier__example">button-primary-bg: {color-primary}<br>button-primary-text: {color-on-primary}</div>
+            </div>
+          </div>
+
+          <div class="callout">
+            <p class="callout__label">なぜ3層が必要か</p>
+            <p>ブランドカラーが #0066cc から #0052a3 に変わった場合、Global Tokenの blue-600 だけを更新すれば、それを参照するすべてのAlias・Component Tokenが自動的に更新される。1箇所の変更がシステム全体に伝播する。</p>
+          </div>
+        </section>
+
+        <section id="naming" class="prose">
+          <h2>命名規則</h2>
+          <p>design.mdのトークン命名は <span class="token-name">{カテゴリ.用途-修飾子}</span> のパターンに従う。</p>
+
+          <div class="naming-grid">
+            <span class="naming-segment">colors.</span>
+            <span class="naming-desc">カテゴリ接頭辞。colors / typography / spacing / rounded / elevation / component</span>
+            <span class="naming-segment">primary</span>
+            <span class="naming-desc">意図または用途。何のための値か。</span>
+            <span class="naming-segment">-on-dark</span>
+            <span class="naming-desc">（任意）コンテキスト修飾子。特定の背景上での使用を示す。</span>
+          </div>
+
+          <p>例: <span class="token-name">{colors.primary-on-dark}</span> = 「ダーク背景でのプライマリカラー」</p>
+
+          <h3>実際のトークン例</h3>
+          <table class="token-table">
+            <thead><tr><th>トークン</th><th>値</th><th class="desc">用途</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>{colors.primary}</td>
+                <td>#0066cc</td>
+                <td class="desc">全ページ共通のプライマリアクション色</td>
+              </tr>
+              <tr>
+                <td>{colors.primary-on-dark}</td>
+                <td>#2997ff</td>
+                <td class="desc">暗背景上での青リンク（アクセシビリティ調整）</td>
+              </tr>
+              <tr>
+                <td>{colors.canvas-parchment}</td>
+                <td>#f5f5f7</td>
+                <td class="desc">パーチメントセクション背景</td>
+              </tr>
+              <tr>
+                <td>{typography.hero-display}</td>
+                <td>56px/600/lh1.07</td>
+                <td class="desc">ヒーローセクションの最大見出し</td>
+              </tr>
+              <tr>
+                <td>{spacing.section}</td>
+                <td>80px</td>
+                <td class="desc">セクション垂直パディング（台座）</td>
+              </tr>
+              <tr>
+                <td>{rounded.pill}</td>
+                <td>9999px</td>
+                <td class="desc">CTAボタンおよびアクションUI</td>
+              </tr>
+              <tr>
+                <td>{elevation.product-shadow}</td>
+                <td>rgba(0,0,0,0.22) 3px 5px 30px 0</td>
+                <td class="desc">製品レンダリング専用の唯一のshadow</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="css" class="prose">
+          <h2>CSS カスタムプロパティ実装</h2>
+          <p>design.mdのトークンをCSSに実装するとき、<span class="token-name">:root</span> セレクタにカスタムプロパティとして定義する。これがTier1〜2のトークンだ。</p>
+
+          <div class="code-block">
+            <span class="code-comment">/* Tier 1 — Global Tokens */</span><br>
+            <span class="code-sel">:root</span> {<br>
+            &nbsp;&nbsp;<span class="code-comment">/* Blue scale */</span><br>
+            &nbsp;&nbsp;<span class="code-prop">--blue-600</span>: <span class="code-val">#0066cc</span>;<br>
+            &nbsp;&nbsp;<span class="code-prop">--blue-500</span>: <span class="code-val">#0071e3</span>;<br>
+            &nbsp;&nbsp;<span class="code-prop">--blue-400</span>: <span class="code-val">#2997ff</span>;<br>
+            &nbsp;&nbsp;<br>
+            &nbsp;&nbsp;<span class="code-comment">/* Neutral scale */</span><br>
+            &nbsp;&nbsp;<span class="code-prop">--gray-900</span>: <span class="code-val">#1d1d1f</span>;<br>
+            &nbsp;&nbsp;<span class="code-prop">--gray-200</span>: <span class="code-val">#f5f5f7</span>;<br>
+            &nbsp;&nbsp;<span class="code-prop">--white</span>: <span class="code-val">#ffffff</span>;<br>
+            }<br>
+            <br>
+            <span class="code-comment">/* Tier 2 — Alias Tokens */</span><br>
+            <span class="code-sel">:root</span> {<br>
+            &nbsp;&nbsp;<span class="code-prop">--color-primary</span>: <span class="code-func">var</span>(<span class="code-str">--blue-600</span>);<br>
+            &nbsp;&nbsp;<span class="code-prop">--color-primary-focus</span>: <span class="code-func">var</span>(<span class="code-str">--blue-500</span>);<br>
+            &nbsp;&nbsp;<span class="code-prop">--color-primary-on-dark</span>: <span class="code-func">var</span>(<span class="code-str">--blue-400</span>);<br>
+            &nbsp;&nbsp;<span class="code-prop">--color-ink</span>: <span class="code-func">var</span>(<span class="code-str">--gray-900</span>);<br>
+            &nbsp;&nbsp;<span class="code-prop">--color-canvas</span>: <span class="code-func">var</span>(<span class="code-str">--white</span>);<br>
+            &nbsp;&nbsp;<span class="code-prop">--color-canvas-parchment</span>: <span class="code-func">var</span>(<span class="code-str">--gray-200</span>);<br>
+            }<br>
+            <br>
+            <span class="code-comment">/* Tier 3 — Component Token（インライン例）*/</span><br>
+            <span class="code-sel">.button-primary</span> {<br>
+            &nbsp;&nbsp;<span class="code-prop">background</span>: <span class="code-func">var</span>(<span class="code-str">--color-primary</span>);<br>
+            &nbsp;&nbsp;<span class="code-prop">color</span>: <span class="code-val">#ffffff</span>;<br>
+            }
+          </div>
+
+          <div class="callout">
+            <p class="callout__label">CSS変数の二段階参照</p>
+            <p>Alias TokenがGlobal Tokenを参照する（<span class="token-name">var(--blue-600)</span>）。コンポーネントがAlias Tokenを参照する（<span class="token-name">var(--color-primary)</span>）。この二重の間接参照が、変更の一元管理を可能にする。</p>
+          </div>
+        </section>
+
+        <section id="figma" class="prose">
+          <h2>Figma Variables との対応</h2>
+          <p>Figma Variables（2023年以降）は、design.mdのトークン構造と1:1で対応するように設計できる。</p>
+
+          <div style="border:1px solid var(--color-hairline); border-radius:var(--rounded-lg); overflow:hidden; margin:24px 0;">
+            <div style="padding:12px 20px; background:var(--color-canvas-parchment); border-bottom:1px solid var(--color-hairline); font-size:12px; font-weight:600; color:var(--color-ink-muted-48); letter-spacing:0.3px; text-transform:uppercase;">Figma Variables 構成</div>
+            <div style="padding:16px 20px; display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:12px; height:12px; border-radius:2px; background:#e5f0ff; border:1px solid rgba(0,102,204,0.3); flex-shrink:0;"></div>
+                <div style="font-size:13px; color:var(--color-ink);"><strong>Global</strong> コレクション — blue-600, gray-900 など生の値</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:12px; height:12px; border-radius:2px; background:#cce0ff; border:1px solid rgba(0,102,204,0.4); flex-shrink:0;"></div>
+                <div style="font-size:13px; color:var(--color-ink);"><strong>Semantic</strong> コレクション — color-primary → {blue-600}</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:12px; height:12px; border-radius:2px; background:#99c2ff; border:1px solid rgba(0,102,204,0.5); flex-shrink:0;"></div>
+                <div style="font-size:13px; color:var(--color-ink);"><strong>Component</strong> コレクション — button-bg → {color-primary}</div>
+              </div>
+            </div>
+          </div>
+
+          <p>Figma Variables のモード機能を使うと、同じ変数名でライトモードとダークモードの値を切り替えられる。</p>
+
+          <div class="code-block">
+            <span class="code-comment">/* Figma変数エクスポート → CSS変数への変換 */</span><br>
+            <span class="code-comment">/* ツール: Style Dictionary, Theo, Token Pipeline */</span><br>
+            <br>
+            <span class="code-comment">/* tokens.json (Design Token format) */</span><br>
+            {<br>
+            &nbsp;&nbsp;<span class="code-prop">"colors"</span>: {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">"primary"</span>: {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">"value"</span>: <span class="code-str">"#0066cc"</span>,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">"type"</span>: <span class="code-str">"color"</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+            &nbsp;&nbsp;}<br>
+            }
+          </div>
+        </section>
+
+        <section id="modes" class="prose">
+          <h2>ライト/ダークモード</h2>
+          <p>CSS変数を使ったモード切り替えは、Alias Tokenレイヤーで実現する。Global Tokenは変わらず、Alias Tokenの参照先だけが切り替わる。</p>
+
+          <div class="mode-demo">
+            <div class="mode-panel mode-panel--light">
+              <div class="mode-panel__title">ライトモード</div>
+              <div class="mode-panel__btn">詳しく見る</div>
+              <div class="mode-panel__sub">color-primary: #0066cc<br>color-ink: #1d1d1f<br>canvas: #ffffff</div>
+            </div>
+            <div class="mode-panel mode-panel--dark">
+              <div class="mode-panel__title">ダークモード</div>
+              <div class="mode-panel__btn">詳しく見る</div>
+              <div class="mode-panel__sub">color-primary: #2997ff<br>color-ink: #f5f5f7<br>canvas: #1c1c1e</div>
+            </div>
+          </div>
+
+          <p>ダークモードでプライマリカラーが青から明るい青（#2997ff）に変わる理由は<strong>コントラスト比の確保</strong>だ。#0066cc は暗背景では WCAG AAに届かない場合があるため、より明るい値が必要になる。</p>
+
+          <div class="code-block">
+            <span class="code-comment">/* ライトモード（デフォルト）*/</span><br>
+            <span class="code-sel">:root</span> {<br>
+            &nbsp;&nbsp;<span class="code-prop">--color-primary</span>: <span class="code-val">#0066cc</span>;<br>
+            &nbsp;&nbsp;<span class="code-prop">--color-ink</span>: <span class="code-val">#1d1d1f</span>;<br>
+            &nbsp;&nbsp;<span class="code-prop">--color-canvas</span>: <span class="code-val">#ffffff</span>;<br>
+            }<br>
+            <br>
+            <span class="code-comment">/* ダークモード */</span><br>
+            <span class="code-sel">@media (prefers-color-scheme: dark)</span> {<br>
+            &nbsp;&nbsp;<span class="code-sel">:root</span> {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">--color-primary</span>: <span class="code-val">#2997ff</span>;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">--color-ink</span>: <span class="code-val">#f5f5f7</span>;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">--color-canvas</span>: <span class="code-val">#1c1c1e</span>;<br>
+            &nbsp;&nbsp;}<br>
+            }
+          </div>
+        </section>
+
+        <section id="catalog" class="prose">
+          <h2>design.md の全トークンカタログ</h2>
+          <p>このモジュールで学んできた内容の総まとめとして、design.mdのトークンを分類整理する。</p>
+
+          <h3>カラートークン</h3>
+          <table class="token-table">
+            <thead><tr><th>トークン名</th><th>値</th><th class="desc">分類</th></tr></thead>
+            <tbody>
+              <tr><td>{colors.primary}</td><td>#0066cc</td><td class="desc">アクション</td></tr>
+              <tr><td>{colors.primary-focus}</td><td>#0071e3</td><td class="desc">フォーカス状態</td></tr>
+              <tr><td>{colors.primary-on-dark}</td><td>#2997ff</td><td class="desc">暗背景上のアクション</td></tr>
+              <tr><td>{colors.canvas}</td><td>#ffffff</td><td class="desc">ページ床面</td></tr>
+              <tr><td>{colors.canvas-parchment}</td><td>#f5f5f7</td><td class="desc">第2層セクション</td></tr>
+              <tr><td>{colors.surface-pearl}</td><td>#fafafc</td><td class="desc">Pearl Button背景</td></tr>
+              <tr><td>{colors.surface-tile-1}</td><td>#272729</td><td class="desc">ダークサーフェス</td></tr>
+              <tr><td>{colors.surface-black}</td><td>#000000</td><td class="desc">グローバルナビ</td></tr>
+              <tr><td>{colors.ink}</td><td>#1d1d1f</td><td class="desc">本文テキスト</td></tr>
+              <tr><td>{colors.ink-muted-48}</td><td>#7a7a7a</td><td class="desc">補助テキスト</td></tr>
+              <tr><td>{colors.hairline}</td><td>#e0e0e0</td><td class="desc">境界線</td></tr>
+            </tbody>
+          </table>
+
+          <h3>スペーシングトークン</h3>
+          <table class="token-table">
+            <thead><tr><th>トークン名</th><th>値</th><th class="desc">用途</th></tr></thead>
+            <tbody>
+              <tr><td>{spacing.section}</td><td>80px</td><td class="desc">セクション垂直パディング（台座）</td></tr>
+              <tr><td>{spacing.section-sm}</td><td>40px</td><td class="desc">モバイルセクションパディング</td></tr>
+              <tr><td>{spacing.content-gap}</td><td>20px</td><td class="desc">コンテンツブロック間の標準余白</td></tr>
+              <tr><td>{spacing.page-side}</td><td>22px</td><td class="desc">グローバルナビ左右余白</td></tr>
+            </tbody>
+          </table>
+
+          <h3>ボーダーラジウストークン</h3>
+          <table class="token-table">
+            <thead><tr><th>トークン名</th><th>値</th><th class="desc">使用コンポーネント</th></tr></thead>
+            <tbody>
+              <tr><td>{rounded.sm}</td><td>8px</td><td class="desc">ユーティリティボタン・インライン画像</td></tr>
+              <tr><td>{rounded.md}</td><td>11px</td><td class="desc">Pearl Button</td></tr>
+              <tr><td>{rounded.lg}</td><td>18px</td><td class="desc">ストアカード・モーダル</td></tr>
+              <tr><td>{rounded.pill}</td><td>9999px</td><td class="desc">CTAボタン・検索・チップ</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="exercise">
+          <div class="exercise">
+            <span class="exercise__badge">演習</span>
+            <h2 class="exercise__title">トークンシステムを実装する</h2>
+            <p class="exercise__desc">design.mdをベースに、CSS変数とFigma Variables の両方でトークンシステムをゼロから実装してください。</p>
+            <ol class="exercise__steps">
+              <li>空のCSSファイルに :root ブロックを作成し、design.mdのカラートークンを全てCSS変数として定義する。Global → Alias の2段階で定義すること。</li>
+              <li>そのCSS変数を使って、button-primary コンポーネントを実装する。background / color / border-radius / padding / font-size の5つを全てvar()で参照する。</li>
+              <li>Figmaで新しいVariables コレクションを3つ作成（Global / Semantic / Component）し、同じ階層を再現する。</li>
+              <li>@media (prefers-color-scheme: dark) を追加し、3〜5個のトークンをダークモード用の値でオーバーライドする。ブラウザのダークモード設定で動作を確認する。</li>
+              <li>「トークンがなかった場合、どこが壊れていたか」を説明するコメントをCSSに追加してコミュニティに投稿する。</li>
+            </ol>
+          </div>
+        </section>
+
+        <nav class="module-nav">
+          <a class="module-nav__btn" href="module-07.html">← Module 07</a>
+          <span class="module-nav__center">Module 08 / 12</span>
+          <a class="module-nav__btn" href="module-09.html">Module 09 →</a>
+        </nav>
+      </article>
+    </main>
+  </div>
+</body>
+</html>
