@@ -97,7 +97,7 @@
     .tier-arrow { text-align: center; font-size: 18px; color: var(--color-ink-muted-48); line-height: 1; }
 
     /* ── Token table ───────────────────────── */
-    .token-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    .token-table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-collapse: collapse; margin: 24px 0; }
     .token-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-ink-muted-48); letter-spacing: 0.3px; text-transform: uppercase; border-bottom: 1px solid var(--color-hairline); }
     .token-table td { padding: 10px 12px; font-size: 12px; color: var(--color-ink); letter-spacing: -0.12px; border-bottom: 1px solid var(--color-divider-soft); vertical-align: top; font-family: monospace; }
     .token-table td.desc { font-family: 'Inter', sans-serif; font-size: 13px; letter-spacing: -0.224px; }
@@ -123,7 +123,18 @@
     .naming-segment { font-family: monospace; font-size: 13px; color: var(--color-primary); background: rgba(0,102,204,0.08); padding: 4px 10px; border-radius: 4px; white-space: nowrap; }
     .naming-desc { font-size: 13px; color: var(--color-ink); letter-spacing: -0.224px; line-height: 1.5; padding-top: 3px; }
 
-    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .article { padding: 40px 24px 80px; } .mode-demo { grid-template-columns: 1fr; } .naming-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } main { min-width: 0; overflow-x: hidden; } .article { padding: 40px 24px 80px; max-width: 100%; min-width: 0; overflow-x: hidden; } .mode-demo { grid-template-columns: 1fr; } .naming-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 480px) {
+      .sub-nav { padding: 0 16px; }
+      .progress-label { display: none; }
+      .progress-bar { width: 56px; }
+      .module-nav { flex-wrap: wrap; gap: 12px; justify-content: center; }
+      .module-nav__center { width: 100%; text-align: center; order: -1; }
+      .article { padding: 32px 16px 80px; }
+      .tier { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .tier__example { word-break: break-all; font-size: 10px; }
+      .code-block { font-size: 11px; padding: 16px; }
+    }
   </style>
 </head>
 <body>

@@ -235,10 +235,23 @@
     @media (max-width: 833px) {
       .page-layout { grid-template-columns: 1fr; }
       .sidebar { display: none; }
-      .article { padding: 40px 24px 80px; }
+      main { min-width: 0; overflow-x: hidden; }
+      .article { padding: 40px 24px 80px; max-width: 100%; min-width: 0; overflow-x: hidden; }
       .before-after { grid-template-columns: 1fr; }
       .tracking-compare { grid-template-columns: 1fr; }
       .lh-demo { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .sub-nav { padding: 0 16px; }
+      .progress-label { display: none; }
+      .progress-bar { width: 56px; }
+      .module-nav { flex-wrap: wrap; gap: 12px; justify-content: center; }
+      .module-nav__center { width: 100%; text-align: center; order: -1; }
+      .article { padding: 32px 16px 80px; }
+      .weight-demo { padding: 20px 16px; }
+      .weight-demo span[style] { min-width: 0 !important; font-size: 15px !important; }
+      .weight-label { width: 56px; font-size: 9px; }
+      .type-demo { padding: 24px 16px; }
     }
   </style>
 </head>

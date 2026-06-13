@@ -100,7 +100,15 @@
     .completion-banner__sub { font-size: 17px; font-weight: 300; color: var(--color-body-muted); line-height: 1.47; margin-bottom: 32px; }
     .completion-banner__cta { display: inline-flex; align-items: center; padding: 12px 24px; border-radius: 9999px; background: var(--color-primary-on-dark); color: #fff; font-size: 17px; font-weight: 400; text-decoration: none; }
 
-    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } .article { padding: 40px 24px 80px; } .module-summary-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 833px) { .page-layout { grid-template-columns: 1fr; } .sidebar { display: none; } main { min-width: 0; overflow-x: hidden; } .article { max-width: 100%; min-width: 0; overflow-x: hidden; } .article { padding: 40px 24px 80px; } .module-summary-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 480px) {
+      .sub-nav { padding: 0 16px; }
+      .progress-label { display: none; }
+      .progress-bar { width: 56px; }
+      .module-nav { flex-wrap: wrap; gap: 12px; justify-content: center; }
+      .module-nav__center { width: 100%; text-align: center; order: -1; }
+      .article { padding: 32px 16px 80px; }
+    }
   </style>
 </head>
 <body>

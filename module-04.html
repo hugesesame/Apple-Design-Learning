@@ -263,7 +263,22 @@
     @media (max-width: 833px) {
       .page-layout { grid-template-columns: 1fr; }
       .sidebar { display: none; }
-      .article { padding: 40px 24px 80px; }
+      main { min-width: 0; overflow-x: hidden; }
+      .article { padding: 40px 24px 80px; max-width: 100%; min-width: 0; overflow-x: hidden; }
+    }
+    @media (max-width: 480px) {
+      .sub-nav { padding: 0 16px; }
+      .progress-label { display: none; }
+      .progress-bar { width: 56px; }
+      .module-nav { flex-wrap: wrap; gap: 12px; justify-content: center; }
+      .module-nav__center { width: 100%; text-align: center; order: -1; }
+      .article { padding: 32px 16px 80px; }
+      .spacing-token { min-width: 0; font-size: 10px; }
+      .spacing-use { display: none; }
+      .spacing-bar { max-width: 60px; }
+      .collapse-label { white-space: normal; font-size: 11px; }
+      .collapse-row { gap: 8px; }
+      .grid-demo { padding: 16px; }
     }
   </style>
 </head>
